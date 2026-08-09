@@ -1,8 +1,7 @@
 export default function Sidebar() {
   return (
     // Menu de navigation principal de Datasports
-    <aside className="min-h-screen w-64 border-r border-zinc-800 bg-zinc-900 p-6">
-
+    <aside className="hidden min-h-screen w-64 shrink-0 border-r border-zinc-800 bg-zinc-900 p-6 lg:block">
       {/* Logo / nom de la plateforme */}
       <div>
         <h1 className="text-xl font-bold text-white">
