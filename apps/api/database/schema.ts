@@ -7,6 +7,306 @@
 import { BaseModel, column } from "@adonisjs/lucid/orm";
 import type { DateTime } from "luxon";
 
+export class ClubSchema extends BaseModel {
+  static $columns = ["country", "createdAt", "id", "name", "updatedAt"] as const;
+  $columns = ClubSchema.$columns;
+  @column()
+  declare country: string | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare name: string;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
+}
+
+export class EvaluationAnswerSchema extends BaseModel {
+  static $columns = [
+    "comment",
+    "createdAt",
+    "evaluationCriterionId",
+    "id",
+    "observationId",
+    "score",
+  ] as const;
+  $columns = EvaluationAnswerSchema.$columns;
+  @column()
+  declare comment: string | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare evaluationCriterionId: number;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare observationId: number;
+  @column()
+  declare score: number;
+}
+
+export class EvaluationCategorySchema extends BaseModel {
+  static $columns = [
+    "createdAt",
+    "displayOrder",
+    "evaluationGridId",
+    "id",
+    "name",
+    "updatedAt",
+  ] as const;
+  $columns = EvaluationCategorySchema.$columns;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare displayOrder: number;
+  @column()
+  declare evaluationGridId: number;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare name: string;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
+}
+
+export class EvaluationCriterionSchema extends BaseModel {
+  static $columns = [
+    "createdAt",
+    "displayOrder",
+    "evaluationCategoryId",
+    "id",
+    "name",
+    "updatedAt",
+  ] as const;
+  $columns = EvaluationCriterionSchema.$columns;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare displayOrder: number;
+  @column()
+  declare evaluationCategoryId: number;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare name: string;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
+}
+
+export class EvaluationGridSchema extends BaseModel {
+  static $columns = ["createdAt", "id", "isActive", "name", "positionType", "updatedAt"] as const;
+  $columns = EvaluationGridSchema.$columns;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare isActive: boolean;
+  @column()
+  declare name: string;
+  @column()
+  declare positionType: string;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
+}
+
+export class MatchSchema extends BaseModel {
+  static $columns = [
+    "awayClubId",
+    "competition",
+    "createdAt",
+    "homeClubId",
+    "id",
+    "matchDate",
+    "updatedAt",
+    "venue",
+  ] as const;
+  $columns = MatchSchema.$columns;
+  @column()
+  declare awayClubId: number | null;
+  @column()
+  declare competition: string | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare homeClubId: number | null;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column.dateTime()
+  declare matchDate: DateTime;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
+  @column()
+  declare venue: string | null;
+}
+
+export class MissionTargetSchema extends BaseModel {
+  static $columns = ["createdAt", "id", "missionId", "playerId"] as const;
+  $columns = MissionTargetSchema.$columns;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare missionId: number;
+  @column()
+  declare playerId: number;
+}
+
+export class MissionSchema extends BaseModel {
+  static $columns = [
+    "createdAt",
+    "createdBy",
+    "declineReason",
+    "id",
+    "matchId",
+    "respondedAt",
+    "scoutId",
+    "status",
+    "updatedAt",
+  ] as const;
+  $columns = MissionSchema.$columns;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare createdBy: number | null;
+  @column()
+  declare declineReason: string | null;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare matchId: number;
+  @column.dateTime()
+  declare respondedAt: DateTime | null;
+  @column()
+  declare scoutId: number;
+  @column()
+  declare status: string;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
+}
+
+export class ObservationSchema extends BaseModel {
+  static $columns = [
+    "analysisGenerated",
+    "analysisValidated",
+    "createdAt",
+    "currentLevel",
+    "decision",
+    "evaluationGridId",
+    "generalComment",
+    "id",
+    "missionId",
+    "pitchCondition",
+    "playerId",
+    "playingTimeMinutes",
+    "potential",
+    "strengths",
+    "updatedAt",
+    "weaknesses",
+    "weather",
+  ] as const;
+  $columns = ObservationSchema.$columns;
+  @column()
+  declare analysisGenerated: string | null;
+  @column()
+  declare analysisValidated: string | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column()
+  declare currentLevel: number | null;
+  @column()
+  declare decision: string | null;
+  @column()
+  declare evaluationGridId: number;
+  @column()
+  declare generalComment: string | null;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare missionId: number;
+  @column()
+  declare pitchCondition: string | null;
+  @column()
+  declare playerId: number;
+  @column()
+  declare playingTimeMinutes: number | null;
+  @column()
+  declare potential: string | null;
+  @column()
+  declare strengths: any;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
+  @column()
+  declare weaknesses: any;
+  @column()
+  declare weather: string | null;
+}
+
+export class ObservedPositionSchema extends BaseModel {
+  static $columns = ["createdAt", "id", "observationId", "position"] as const;
+  $columns = ObservedPositionSchema.$columns;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare observationId: number;
+  @column()
+  declare position: string;
+}
+
+export class PlayerStatusHistorySchema extends BaseModel {
+  static $columns = ["changedBy", "createdAt", "id", "note", "playerId", "status"] as const;
+  $columns = PlayerStatusHistorySchema.$columns;
+  @column()
+  declare changedBy: number | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare note: string | null;
+  @column()
+  declare playerId: number;
+  @column()
+  declare status: string;
+}
+
+export class PlayerSchema extends BaseModel {
+  static $columns = [
+    "clubId",
+    "createdAt",
+    "dateOfBirth",
+    "firstName",
+    "id",
+    "lastName",
+    "officialPosition",
+    "status",
+    "updatedAt",
+  ] as const;
+  $columns = PlayerSchema.$columns;
+  @column()
+  declare clubId: number | null;
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+  @column.date()
+  declare dateOfBirth: DateTime | null;
+  @column()
+  declare firstName: string | null;
+  @column({ isPrimary: true })
+  declare id: number;
+  @column()
+  declare lastName: string;
+  @column()
+  declare officialPosition: string | null;
+  @column()
+  declare status: string;
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
+}
+
 export class UserSchema extends BaseModel {
   static $columns = [
     "createdAt",
