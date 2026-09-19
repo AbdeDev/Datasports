@@ -1,3 +1,4 @@
+import db from "@adonisjs/lucid/services/db";
 import { DateTime } from "luxon";
 import Mission from "#models/mission";
 import MissionTarget from "#models/mission_target";
@@ -41,16 +42,24 @@ export default class MissionService {
   }
 
   async create(data: { matchId: number; scoutId: number; playerIds: number[] }, createdBy: User) {
-    const mission = await Mission.create({
-      matchId: data.matchId,
-      scoutId: data.scoutId,
-      createdBy: createdBy.id,
-      status: "proposee",
-    });
+    const mission = await db.transaction(async (trx) => {
+      const mission = await Mission.create(
+        {
+          matchId: data.matchId,
+          scoutId: data.scoutId,
+          createdBy: createdBy.id,
+          status: "proposee",
+        },
+        { client: trx },
+      );
 
-    await MissionTarget.createMany(
-      data.playerIds.map((playerId) => ({ missionId: mission.id, playerId })),
-    );
+      await MissionTarget.createMany(
+        data.playerIds.map((playerId) => ({ missionId: mission.id, playerId })),
+        { client: trx },
+      );
+
+      return mission;
+    });
 
     return this.findForUser(mission.id, createdBy);
   }
@@ -60,42 +69,51 @@ export default class MissionService {
     scout: User,
     data: { decision: "accept" | "decline"; declineReason?: string },
   ) {
-    const mission = await Mission.findOrFail(missionId);
-
-    if (mission.scoutId !== scout.id) {
-      throw new MissionForbiddenError("This mission does not belong to you");
-    }
-
     // A scout who declined (a_reattribuer) or withdrew (scout_indisponible)
     // can still change their mind and respond again — as long as it hasn't
-    // been reassigned away from them yet (the ownership check above already
-    // guarantees that).
-    if (!["proposee", "a_reattribuer", "scout_indisponible"].includes(mission.status)) {
+    // been reassigned away from them yet (guarded by the scout_id match
+    // below). The update is conditional on both scout and status in one
+    // atomic statement so two concurrent requests can't both "win".
+    const updated = await Mission.query()
+      .where("id", missionId)
+      .where("scout_id", scout.id)
+      .whereIn("status", ["proposee", "a_reattribuer", "scout_indisponible"])
+      .returning("id")
+      .update({
+        status: data.decision === "accept" ? "acceptee" : "a_reattribuer",
+        declineReason: data.decision === "decline" ? (data.declineReason ?? null) : null,
+        respondedAt: DateTime.now().toSQL(),
+      });
+
+    if (updated.length === 0) {
+      const mission = await Mission.findOrFail(missionId);
+      if (mission.scoutId !== scout.id) {
+        throw new MissionForbiddenError("This mission does not belong to you");
+      }
       throw new MissionConflictError("This mission is not awaiting a response");
     }
 
-    mission.status = data.decision === "accept" ? "acceptee" : "a_reattribuer";
-    mission.declineReason = data.decision === "decline" ? (data.declineReason ?? null) : null;
-    mission.respondedAt = DateTime.now();
-    await mission.save();
-
-    return this.findForUser(mission.id, scout);
+    return this.findForUser(missionId, scout);
   }
 
   async reassign(missionId: number, newScoutId: number, admin: User) {
-    const mission = await Mission.findOrFail(missionId);
+    const updated = await Mission.query()
+      .where("id", missionId)
+      .whereIn("status", ["proposee", "a_reattribuer", "scout_indisponible"])
+      .returning("id")
+      .update({
+        scoutId: newScoutId,
+        status: "proposee",
+        declineReason: null,
+        respondedAt: null,
+      });
 
-    if (!["proposee", "a_reattribuer", "scout_indisponible"].includes(mission.status)) {
+    if (updated.length === 0) {
+      await Mission.findOrFail(missionId);
       throw new MissionConflictError("Only a pending or unassigned mission can be reassigned");
     }
 
-    mission.scoutId = newScoutId;
-    mission.status = "proposee";
-    mission.declineReason = null;
-    mission.respondedAt = null;
-    await mission.save();
-
-    return this.findForUser(mission.id, admin);
+    return this.findForUser(missionId, admin);
   }
 
   /**
@@ -104,22 +122,26 @@ export default class MissionService {
    * indisponible" from "À réattribuer").
    */
   async withdraw(missionId: number, scout: User, reason?: string) {
-    const mission = await Mission.findOrFail(missionId);
+    const updated = await Mission.query()
+      .where("id", missionId)
+      .where("scout_id", scout.id)
+      .where("status", "acceptee")
+      .returning("id")
+      .update({
+        status: "scout_indisponible",
+        declineReason: reason ?? null,
+        respondedAt: DateTime.now().toSQL(),
+      });
 
-    if (mission.scoutId !== scout.id) {
-      throw new MissionForbiddenError("This mission does not belong to you");
-    }
-
-    if (mission.status !== "acceptee") {
+    if (updated.length === 0) {
+      const mission = await Mission.findOrFail(missionId);
+      if (mission.scoutId !== scout.id) {
+        throw new MissionForbiddenError("This mission does not belong to you");
+      }
       throw new MissionConflictError("Only an accepted mission can be withdrawn from");
     }
 
-    mission.status = "scout_indisponible";
-    mission.declineReason = reason ?? null;
-    mission.respondedAt = DateTime.now();
-    await mission.save();
-
-    return this.findForUser(mission.id, scout);
+    return this.findForUser(missionId, scout);
   }
 
   /**
@@ -129,17 +151,21 @@ export default class MissionService {
    * the domain (brief §11).
    */
   async cancel(missionId: number, reason: string | undefined, admin: User) {
-    const mission = await Mission.findOrFail(missionId);
+    const updated = await Mission.query()
+      .where("id", missionId)
+      .whereNotIn("status", ["annulee", "terminee"])
+      .returning("id")
+      .update({
+        status: "annulee",
+        declineReason: reason ?? null,
+      });
 
-    if (["annulee", "terminee"].includes(mission.status)) {
+    if (updated.length === 0) {
+      await Mission.findOrFail(missionId);
       throw new MissionConflictError("This mission can no longer be cancelled");
     }
 
-    mission.status = "annulee";
-    mission.declineReason = reason ?? null;
-    await mission.save();
-
-    return this.findForUser(mission.id, admin);
+    return this.findForUser(missionId, admin);
   }
 
   /**
@@ -158,8 +184,10 @@ export default class MissionService {
       throw new MissionForbiddenError("This mission does not belong to you");
     }
 
-    const player = await Player.create({ ...playerData, status: "decouvert" });
-    await MissionTarget.create({ missionId: mission.id, playerId: player.id });
+    await db.transaction(async (trx) => {
+      const player = await Player.create({ ...playerData, status: "decouvert" }, { client: trx });
+      await MissionTarget.create({ missionId: mission.id, playerId: player.id }, { client: trx });
+    });
 
     return this.findForUser(mission.id, scout);
   }

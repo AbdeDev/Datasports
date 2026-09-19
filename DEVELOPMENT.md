@@ -58,6 +58,33 @@ Le front n'utilise le SDK Supabase que pour l'authentification (`src/lib/supabas
 - Les migrations Lucid sont la source de vérité (pas de migrations Supabase CLI).
 - **Pas de seed de démo** : les tables métier (clubs, joueurs, matchs, missions) ne sont jamais pré-remplies avec de fausses données — l'app est utilisée en conditions réelles dès le départ. Le seul seeder existant (`evaluation_grid_seeder.ts`) insère une donnée de référence (la grille des 25 critères définie par le brief), pas une donnée de démo — ne pas ajouter d'autre seeder sans une raison équivalente.
 
+### ⚠️ Piège : `DATABASE_URL` et IPv6 (Render)
+
+Le hostname de connexion directe Supabase (`db.<projet>.supabase.co`) résout en **IPv6 uniquement** sauf si l'add-on IPv4 est activé sur le projet. Render (comme beaucoup d'hébergeurs) n'a pas de sortie réseau IPv6 par défaut : chaque requête échoue alors avec `ENETUNREACH` dans les logs, ce qui remonte côté client en simple 500 sans détail. Sur Render, `DATABASE_URL` doit pointer vers le **Session pooler** Supabase (IPv4) plutôt que la connexion directe — dashboard Supabase → Project Settings → Database → Connection Pooling → mode **Session** (pas Transaction, pour rester compatible avec la façon dont Lucid gère son propre pool). Local et CI peuvent garder la connexion directe.
+
+### Écritures multi-tables : toujours en transaction
+
+Toute action qui écrit dans plusieurs tables (créer une mission + ses cibles, soumettre une évaluation + positions + réponses + statut mission + statut joueur + historique) est enveloppée dans `db.transaction(async (trx) => { ... })` (`import db from "@adonisjs/lucid/services/db"`) avec chaque écriture passée via `{ client: trx }` (ou `instance.useTransaction(trx)` avant un `.save()` sur un modèle déjà chargé). Sans ça, une erreur en cours de séquence laisse des données à moitié écrites (ex. une mission "terminée" sans ses réponses).
+
+### Transitions de statut : mises à jour atomiques, pas lire-puis-écrire
+
+Les méthodes qui changent le statut d'une mission (`respond`, `reassign`, `withdraw`, `cancel`, et la transition `acceptee → terminee` dans `ObservationService.create`) utilisent une écriture conditionnelle atomique en une seule requête plutôt qu'un `findOrFail` suivi d'un `.save()` :
+
+```ts
+const updated = await Mission.query()
+  .where("id", missionId)
+  .whereIn("status", allowedStatuses) // condition sur l'état actuel, dans la même requête
+  .returning("id")
+  .update({ status: newStatus, ... });
+
+if (updated.length === 0) {
+  // 0 ligne affectée = quelqu'un d'autre a déjà changé le statut entre-temps
+  // (ou la mission n'existe pas / n'appartient pas à cet utilisateur)
+}
+```
+
+Avec plusieurs admins actifs en même temps, un `findOrFail` puis `.save()` peut laisser deux requêtes concurrentes valider la même précondition avant qu'aucune n'ait écrit — la deuxième écrase alors silencieusement le résultat de la première. La version atomique élimine cette fenêtre : la condition sur le statut fait partie du `WHERE` de l'`UPDATE` lui-même.
+
 ## CI
 
 Le job CI a besoin de variables d'environnement factices (non secrètes) pour démarrer l'app Adonis (`.env` n'existe pas sur les runners) — voir le bloc `env:` dans `.github/workflows/ci.yml`. `DATABASE_URL` reste un secret de repo pointant vers le projet Supabase partagé.
