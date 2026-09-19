@@ -18,6 +18,7 @@ import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as EvaluateIdRouteImport } from './routes/evaluate.$id'
 import { Route as MissionsIndexRouteImport } from './routes/missions.index'
 import { Route as MissionsIdRouteImport } from './routes/missions.$id'
+import { Route as PlayersIdRouteImport } from './routes/players.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const MissionsIdRoute = MissionsIdRouteImport.update({
   path: '/missions/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayersIdRoute = PlayersIdRouteImport.update({
+  id: '/players/$id',
+  path: '/players/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/watchlist': typeof WatchlistRoute
   '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
+  '/players/$id': typeof PlayersIdRoute
   '/missions/': typeof MissionsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/watchlist': typeof WatchlistRoute
   '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
+  '/players/$id': typeof PlayersIdRoute
   '/missions': typeof MissionsIndexRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/watchlist': typeof WatchlistRoute
   '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
+  '/players/$id': typeof PlayersIdRoute
   '/missions/': typeof MissionsIndexRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/watchlist'
     | '/evaluate/$id'
     | '/missions/$id'
+    | '/players/$id'
     | '/missions/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/watchlist'
     | '/evaluate/$id'
     | '/missions/$id'
+    | '/players/$id'
     | '/missions'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/watchlist'
     | '/evaluate/$id'
     | '/missions/$id'
+    | '/players/$id'
     | '/missions/'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   WatchlistRoute: typeof WatchlistRoute
   EvaluateIdRoute: typeof EvaluateIdRoute
   MissionsIdRoute: typeof MissionsIdRoute
+  PlayersIdRoute: typeof PlayersIdRoute
   MissionsIndexRoute: typeof MissionsIndexRoute
 }
 
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MissionsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/players/$id': {
+      id: '/players/$id'
+      path: '/players/$id'
+      fullPath: '/players/$id'
+      preLoaderRoute: typeof PlayersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   WatchlistRoute: WatchlistRoute,
   EvaluateIdRoute: EvaluateIdRoute,
   MissionsIdRoute: MissionsIdRoute,
+  PlayersIdRoute: PlayersIdRoute,
   MissionsIndexRoute: MissionsIndexRoute,
 }
 export const routeTree = rootRouteImport

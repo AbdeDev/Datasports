@@ -72,6 +72,8 @@ export type Observation = {
   missionId: number;
   playerId: number;
   decision: ObservationDecision;
+  analysisGenerated: string | null;
+  analysisValidated: string | null;
 };
 
 export function getActiveEvaluationGrid() {
@@ -80,6 +82,12 @@ export function getActiveEvaluationGrid() {
 
 export function createObservation(missionId: number, data: CreateObservationInput) {
   return api.post<Observation>(`/api/v1/missions/${missionId}/observations`, data);
+}
+
+export function validateAnalysis(missionId: number, analysisValidated: string) {
+  return api.patch<Observation>(`/api/v1/missions/${missionId}/observation/analysis`, {
+    analysisValidated,
+  });
 }
 
 export const activeEvaluationGridQueryOptions = queryOptions({

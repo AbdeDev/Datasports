@@ -257,16 +257,18 @@ function TargetPlayers({ mission }: { mission: Mission }) {
       <ul className="mt-2 space-y-2">
         {mission.targets.map((target) => (
           <li key={target.id}>
-            <Card className="flex items-center gap-3 p-3">
-              <div className="flex size-9 shrink-0 items-center justify-center border border-border bg-muted">
-                <UserRound className="size-4 text-muted-foreground" />
-              </div>
-              <p className="text-sm">
-                {target.player.firstName ? `${target.player.firstName} ` : ""}
-                <span className="font-medium">{target.player.lastName}</span>
-                {target.player.officialPosition ? ` — ${target.player.officialPosition}` : ""}
-              </p>
-            </Card>
+            <Link to="/players/$id" params={{ id: String(target.player.id) }} className="block">
+              <Card className="flex items-center gap-3 p-3">
+                <div className="flex size-9 shrink-0 items-center justify-center border border-border bg-muted">
+                  <UserRound className="size-4 text-muted-foreground" />
+                </div>
+                <p className="text-sm">
+                  {target.player.firstName ? `${target.player.firstName} ` : ""}
+                  <span className="font-medium">{target.player.lastName}</span>
+                  {target.player.officialPosition ? ` — ${target.player.officialPosition}` : ""}
+                </p>
+              </Card>
+            </Link>
           </li>
         ))}
       </ul>

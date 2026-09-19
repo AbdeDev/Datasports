@@ -3,7 +3,7 @@ import ObservationService, {
   ObservationConflictError,
   ObservationForbiddenError,
 } from "#services/observation_service";
-import { createObservationValidator } from "#validators/observation";
+import { createObservationValidator, validateAnalysisValidator } from "#validators/observation";
 
 const observationService = new ObservationService();
 
@@ -24,6 +24,28 @@ export default class ObservationsController {
       }
       if (error instanceof ObservationConflictError) {
         return response.conflict({ error: error.message });
+      }
+      throw error;
+    }
+  }
+
+  async validateAnalysis({ authUser, params, request, response }: HttpContext) {
+    if (authUser.role !== "scout") {
+      return response.forbidden({ error: "Only a scout can validate an analysis" });
+    }
+
+    const { analysisValidated } = await request.validateUsing(validateAnalysisValidator);
+
+    try {
+      const observation = await observationService.validateAnalysis(
+        Number(params.id),
+        authUser,
+        analysisValidated,
+      );
+      return response.ok(observation);
+    } catch (error) {
+      if (error instanceof ObservationForbiddenError) {
+        return response.forbidden({ error: error.message });
       }
       throw error;
     }

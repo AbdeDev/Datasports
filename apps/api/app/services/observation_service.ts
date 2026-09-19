@@ -19,6 +19,13 @@ const decisionToPlayerStatus: Record<ObservationDecision, PlayerStatus> = {
   non_retenu: "non_retenu",
 };
 
+const decisionLabels: Record<ObservationDecision, string> = {
+  suivi: "à suivre",
+  prioritaire: "prioritaire",
+  prise_de_contact: "prise de contact",
+  non_retenu: "non retenu",
+};
+
 type CreateObservationInput = {
   playerId: number;
   playingTimeMinutes?: number;
@@ -56,12 +63,12 @@ export default class ObservationService {
 
     const grid = await EvaluationGrid.query().where("is_active", true).firstOrFail();
 
-    const criteria = await EvaluationCriterion.query().whereHas("category", (categoryQuery) =>
-      categoryQuery.where("evaluation_grid_id", grid.id),
-    );
-    const criterionIds = new Set(criteria.map((c) => c.id));
+    const criteria = await EvaluationCriterion.query()
+      .whereHas("category", (categoryQuery) => categoryQuery.where("evaluation_grid_id", grid.id))
+      .preload("category");
+    const criteriaById = new Map(criteria.map((criterion) => [criterion.id, criterion]));
     for (const answer of data.answers) {
-      if (!criterionIds.has(answer.criterionId)) {
+      if (!criteriaById.has(answer.criterionId)) {
         throw new ObservationConflictError("Unknown evaluation criterion");
       }
     }
@@ -94,6 +101,9 @@ export default class ObservationService {
       })),
     );
 
+    observation.analysisGenerated = this.generateAnalysis(data, criteriaById);
+    await observation.save();
+
     // Submitting the evaluation completes the mission (brief §10 status flow).
     mission.status = "terminee";
     await mission.save();
@@ -117,5 +127,77 @@ export default class ObservationService {
       .preload("observedPositions")
       .preload("answers", (answerQuery) => answerQuery.preload("criterion"))
       .firstOrFail();
+  }
+
+  /**
+   * Rule-based synthesis from the raw answers — no external AI call in the
+   * POC. The scout reviews and can rewrite it entirely before validating
+   * (brief §11: both the generated and the validated text are kept).
+   */
+  private generateAnalysis(
+    data: CreateObservationInput,
+    criteriaById: Map<number, EvaluationCriterion>,
+  ): string {
+    const scoresByCategory = new Map<string, number[]>();
+    for (const answer of data.answers) {
+      const categoryName = criteriaById.get(answer.criterionId)?.category.name;
+      if (!categoryName) {
+        continue;
+      }
+      const scores = scoresByCategory.get(categoryName) ?? [];
+      scores.push(answer.score);
+      scoresByCategory.set(categoryName, scores);
+    }
+
+    const categoryAverages = [...scoresByCategory.entries()]
+      .map(([name, scores]) => ({
+        name,
+        average: scores.reduce((sum, score) => sum + score, 0) / scores.length,
+      }))
+      .sort((a, b) => b.average - a.average);
+
+    const sentences: string[] = [
+      `Niveau actuel évalué à ${data.currentLevel}/5, potentiel ${data.potential}.`,
+    ];
+
+    const strongest = categoryAverages[0];
+    const weakest = categoryAverages[categoryAverages.length - 1];
+    if (strongest && weakest && strongest.name !== weakest.name) {
+      sentences.push(
+        `Point fort dominant : ${strongest.name} (${strongest.average.toFixed(1)}/5). ` +
+          `Axe de progression principal : ${weakest.name} (${weakest.average.toFixed(1)}/5).`,
+      );
+    }
+
+    if (data.strengths.length > 0) {
+      sentences.push(`Qualités relevées : ${data.strengths.join(", ")}.`);
+    }
+    if (data.weaknesses.length > 0) {
+      sentences.push(`Points à travailler : ${data.weaknesses.join(", ")}.`);
+    }
+
+    sentences.push(`Décision du scout : ${decisionLabels[data.decision]}.`);
+
+    if (data.generalComment) {
+      sentences.push(data.generalComment);
+    }
+
+    return sentences.join(" ");
+  }
+
+  async validateAnalysis(missionId: number, scout: User, analysisValidated: string) {
+    const observation = await Observation.query()
+      .where("mission_id", missionId)
+      .preload("mission")
+      .firstOrFail();
+
+    if (observation.mission.scoutId !== scout.id) {
+      throw new ObservationForbiddenError("This observation does not belong to you");
+    }
+
+    observation.analysisValidated = analysisValidated;
+    await observation.save();
+
+    return observation;
   }
 }

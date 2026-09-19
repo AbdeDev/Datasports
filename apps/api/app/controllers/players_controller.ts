@@ -18,7 +18,18 @@ export default class PlayersController {
     return Player.query()
       .where("id", params.id)
       .preload("club")
-      .preload("statusHistory", (q) => q.orderBy("created_at", "asc"))
+      .preload("statusHistory", (statusQuery) =>
+        statusQuery.orderBy("created_at", "asc").preload("changedByUser"),
+      )
+      .preload("observations", (observationQuery) =>
+        observationQuery
+          .orderBy("created_at", "asc")
+          .preload("mission", (missionQuery) =>
+            missionQuery
+              .preload("scout")
+              .preload("match", (matchQuery) => matchQuery.preload("homeClub").preload("awayClub")),
+          ),
+      )
       .firstOrFail();
   }
 

@@ -66,6 +66,12 @@ const routes = {
     tokens: [{"old":"/api/v1/missions/:id/observations","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/observations","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/observations","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/observations","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/observations","type":0,"val":"observations","end":""}],
     types: placeholder as Registry['observations.store']['types'],
   },
+  'observations.validate_analysis': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/missions/:id/observation/analysis',
+    tokens: [{"old":"/api/v1/missions/:id/observation/analysis","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/observation/analysis","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/observation/analysis","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/observation/analysis","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/observation/analysis","type":0,"val":"observation","end":""},{"old":"/api/v1/missions/:id/observation/analysis","type":0,"val":"analysis","end":""}],
+    types: placeholder as Registry['observations.validate_analysis']['types'],
+  },
   'evaluation_grids.active': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/evaluation-grids/active',

@@ -127,6 +127,18 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'observations.validate_analysis': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/missions/:id/observation/analysis'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'evaluation_grids.active': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/evaluation-grids/active'

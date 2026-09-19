@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { currentUserQueryOptions } from "@/features/auth/api";
 import {
   type EvaluationCriterion,
+  type Observation,
   type ObservationDecision,
   type Potential,
   activeEvaluationGridQueryOptions,
@@ -16,11 +17,11 @@ import {
 import { PitchPicker } from "@/features/evaluations/components/pitch-picker";
 import { ScoreScale } from "@/features/evaluations/components/score-scale";
 import { TagInput } from "@/features/evaluations/components/tag-input";
-import { useCreateObservation } from "@/features/evaluations/hooks";
+import { useCreateObservation, useValidateAnalysis } from "@/features/evaluations/hooks";
 import { missionQueryOptions } from "@/features/missions/api";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Check, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Sparkles, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/evaluate/$id")({
@@ -75,7 +76,6 @@ type Step =
 function EvaluateMission() {
   const { id } = Route.useParams();
   const missionId = Number(id);
-  const navigate = useNavigate();
   const { data: mission } = useSuspenseQuery(missionQueryOptions(missionId));
   const { data: grid } = useSuspenseQuery(activeEvaluationGridQueryOptions);
   const { data: currentUser } = useQuery(currentUserQueryOptions);
@@ -128,7 +128,14 @@ function EvaluateMission() {
   }, [mission.targets.length, criteria]);
 
   const [stepIndex, setStepIndex] = useState(0);
+  const [submittedObservation, setSubmittedObservation] = useState<Observation | null>(null);
   const createObservation = useCreateObservation(missionId);
+
+  if (submittedObservation) {
+    return (
+      <AnalysisValidation missionId={missionId} idParam={id} observation={submittedObservation} />
+    );
+  }
 
   if (currentUser && currentUser.role !== "scout") {
     return (
@@ -220,7 +227,7 @@ function EvaluateMission() {
         })),
       },
       {
-        onSuccess: () => navigate({ to: "/missions/$id", params: { id } }),
+        onSuccess: (observation) => setSubmittedObservation(observation),
       },
     );
   }
@@ -550,6 +557,54 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{label}</p>
       <p className="text-sm font-medium">{value || "-"}</p>
     </Card>
+  );
+}
+
+function AnalysisValidation({
+  missionId,
+  idParam,
+  observation,
+}: {
+  missionId: number;
+  idParam: string;
+  observation: Observation;
+}) {
+  const navigate = useNavigate();
+  const validateAnalysis = useValidateAnalysis(missionId);
+  const [text, setText] = useState(observation.analysisGenerated ?? "");
+
+  function handleValidate() {
+    validateAnalysis.mutate(text, {
+      onSuccess: () => navigate({ to: "/missions/$id", params: { id: idParam } }),
+    });
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <div className="flex-1 space-y-6 p-6 pb-28">
+        <div className="flex items-center gap-2">
+          <Sparkles className="size-5 text-primary" />
+          <h1 className="font-heading text-xl font-bold">Analyse générée</h1>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Relis et corrige si besoin avant de valider — les deux versions (générée et validée) sont
+          conservées.
+        </p>
+        <Textarea rows={10} value={text} onChange={(event) => setText(event.target.value)} />
+      </div>
+
+      <footer className="sticky bottom-0 border-t border-border bg-background p-4">
+        <Button
+          size="lg"
+          className="w-full"
+          onClick={handleValidate}
+          disabled={validateAnalysis.isPending || !text.trim()}
+        >
+          <Check className="size-4" />
+          Valider l'analyse
+        </Button>
+      </footer>
+    </div>
   );
 }
 

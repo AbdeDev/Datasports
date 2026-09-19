@@ -33,6 +33,10 @@ router
         router.post(":id/cancel", "#controllers/missions_controller.cancel");
         router.post(":id/targets", "#controllers/missions_controller.addSpottedPlayer");
         router.post(":id/observations", "#controllers/observations_controller.store");
+        router.patch(
+          ":id/observation/analysis",
+          "#controllers/observations_controller.validateAnalysis",
+        );
       })
       .prefix("missions");
 
