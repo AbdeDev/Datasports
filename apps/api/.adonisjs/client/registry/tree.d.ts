@@ -17,6 +17,7 @@ export interface ApiDefinition {
   }
   observations: {
     store: typeof routes['observations.store']
+    validateAnalysis: typeof routes['observations.validate_analysis']
   }
   evaluationGrids: {
     active: typeof routes['evaluation_grids.active']

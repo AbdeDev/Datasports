@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { currentUserQueryOptions } from "@/features/auth/api";
 import {
   type EvaluationCriterion,
+  type Observation,
   type ObservationDecision,
   type Potential,
   activeEvaluationGridQueryOptions,
@@ -16,12 +17,12 @@ import {
 import { PitchPicker } from "@/features/evaluations/components/pitch-picker";
 import { ScoreScale } from "@/features/evaluations/components/score-scale";
 import { TagInput } from "@/features/evaluations/components/tag-input";
-import { useCreateObservation } from "@/features/evaluations/hooks";
+import { useCreateObservation, useValidateAnalysis } from "@/features/evaluations/hooks";
 import { missionQueryOptions } from "@/features/missions/api";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Check, UserRound } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight, Check, Sparkles, UserRound } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/evaluate/$id")({
   loader: ({ context, params }) =>
@@ -75,7 +76,6 @@ type Step =
 function EvaluateMission() {
   const { id } = Route.useParams();
   const missionId = Number(id);
-  const navigate = useNavigate();
   const { data: mission } = useSuspenseQuery(missionQueryOptions(missionId));
   const { data: grid } = useSuspenseQuery(activeEvaluationGridQueryOptions);
   const { data: currentUser } = useQuery(currentUserQueryOptions);
@@ -128,28 +128,11 @@ function EvaluateMission() {
   }, [mission.targets.length, criteria]);
 
   const [stepIndex, setStepIndex] = useState(0);
+  const [submittedObservation, setSubmittedObservation] = useState<Observation | null>(null);
   const createObservation = useCreateObservation(missionId);
 
-  if (currentUser && currentUser.role !== "scout") {
-    return (
-      <StatusMessage
-        title="Accès réservé aux scouts"
-        description="Seul le scout assigné peut soumettre une évaluation pour cette mission."
-        missionId={missionId}
-      />
-    );
-  }
-
-  if (mission.status !== "acceptee") {
-    return (
-      <StatusMessage
-        title="Évaluation indisponible"
-        description="Seule une mission acceptée peut être évaluée."
-        missionId={missionId}
-      />
-    );
-  }
-
+  const canEvaluate =
+    !!currentUser && currentUser.role === "scout" && mission.status === "acceptee";
   const step = steps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / steps.length) * 100);
 
@@ -220,8 +203,72 @@ function EvaluateMission() {
         })),
       },
       {
-        onSuccess: () => navigate({ to: "/missions/$id", params: { id } }),
+        onSuccess: (observation) => setSubmittedObservation(observation),
       },
+    );
+  }
+
+  // Keyboard shortcuts for fast entry: 1-5 scores the current criterion and
+  // advances, Enter goes next/submits, ArrowLeft goes back — all skipped
+  // while typing in a text field so comments aren't disrupted.
+  useEffect(() => {
+    if (!canEvaluate || submittedObservation) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement;
+      const isTextArea = target.tagName === "TEXTAREA";
+      const isTextInput = target.tagName === "INPUT";
+
+      if (step.type === "criterion" && !isTextArea && !isTextInput && /^[1-5]$/.test(event.key)) {
+        updateAnswer(step.criterion.id, { score: Number(event.key) });
+        window.setTimeout(() => goNext(), 150);
+        return;
+      }
+
+      if (event.key === "Enter" && !isTextArea) {
+        event.preventDefault();
+        if (step.type === "review") {
+          handleSubmit();
+        } else if (canGoNext()) {
+          goNext();
+        }
+        return;
+      }
+
+      if (event.key === "ArrowLeft" && !isTextArea && !isTextInput) {
+        goBack();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
+
+  if (submittedObservation) {
+    return (
+      <AnalysisValidation missionId={missionId} idParam={id} observation={submittedObservation} />
+    );
+  }
+
+  if (currentUser && currentUser.role !== "scout") {
+    return (
+      <StatusMessage
+        title="Accès réservé aux scouts"
+        description="Seul le scout assigné peut soumettre une évaluation pour cette mission."
+        missionId={missionId}
+      />
+    );
+  }
+
+  if (mission.status !== "acceptee") {
+    return (
+      <StatusMessage
+        title="Évaluation indisponible"
+        description="Seule une mission acceptée peut être évaluée."
+        missionId={missionId}
+      />
     );
   }
 
@@ -350,6 +397,10 @@ function EvaluateMission() {
                   updateAnswer(step.criterion.id, { comment: event.target.value })
                 }
               />
+              <p className="text-center text-xs text-muted-foreground">
+                Astuce : les touches <kbd className="border border-border px-1">1</kbd>–
+                <kbd className="border border-border px-1">5</kbd> notent et passent à la suite
+              </p>
             </div>
           </StepShell>
         )}
@@ -550,6 +601,54 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{label}</p>
       <p className="text-sm font-medium">{value || "-"}</p>
     </Card>
+  );
+}
+
+function AnalysisValidation({
+  missionId,
+  idParam,
+  observation,
+}: {
+  missionId: number;
+  idParam: string;
+  observation: Observation;
+}) {
+  const navigate = useNavigate();
+  const validateAnalysis = useValidateAnalysis(missionId);
+  const [text, setText] = useState(observation.analysisGenerated ?? "");
+
+  function handleValidate() {
+    validateAnalysis.mutate(text, {
+      onSuccess: () => navigate({ to: "/missions/$id", params: { id: idParam } }),
+    });
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <div className="flex-1 space-y-6 p-6 pb-28">
+        <div className="flex items-center gap-2">
+          <Sparkles className="size-5 text-primary" />
+          <h1 className="font-heading text-xl font-bold">Analyse générée</h1>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Relis et corrige si besoin avant de valider — les deux versions (générée et validée) sont
+          conservées.
+        </p>
+        <Textarea rows={10} value={text} onChange={(event) => setText(event.target.value)} />
+      </div>
+
+      <footer className="sticky bottom-0 border-t border-border bg-background p-4">
+        <Button
+          size="lg"
+          className="w-full"
+          onClick={handleValidate}
+          disabled={validateAnalysis.isPending || !text.trim()}
+        >
+          <Check className="size-4" />
+          Valider l'analyse
+        </Button>
+      </footer>
+    </div>
   );
 }
 

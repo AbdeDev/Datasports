@@ -5,7 +5,8 @@ import { missionsQueryOptions } from "@/features/missions/api";
 import { playersQueryOptions } from "@/features/players/api";
 import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, ChevronRight } from "lucide-react";
+import { AlertCircle, CalendarClock, CalendarDays, ChevronRight, Star } from "lucide-react";
+import type { ComponentType } from "react";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
 
@@ -29,15 +30,28 @@ function Dashboard() {
     players?.filter((p) => !["non_retenu", "archive"].includes(p.status)).length ?? 0;
 
   const firstName = user?.fullName?.split(" ")[0] ?? user?.email.split("@")[0];
+  const today = new Date().toLocaleDateString("fr-CH", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+  });
 
   return (
     <div className="space-y-6 p-6">
-      <h1 className="font-heading text-2xl font-bold">Bonjour {firstName}</h1>
+      <div>
+        <h1 className="font-heading text-2xl font-bold">Bonjour {firstName}</h1>
+        <p className="mt-0.5 text-sm text-muted-foreground capitalize">{today}</p>
+      </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <StatTile label="À venir" value={upcomingCount} />
-        <StatTile label="À traiter" value={toRespondCount} highlight={toRespondCount > 0} />
-        <StatTile label="Suivis" value={followedCount} />
+        <StatTile icon={CalendarClock} label="À venir" value={upcomingCount} />
+        <StatTile
+          icon={AlertCircle}
+          label="À traiter"
+          value={toRespondCount}
+          highlight={toRespondCount > 0}
+        />
+        <StatTile icon={Star} label="Suivis" value={followedCount} />
       </div>
 
       <section>
@@ -46,7 +60,7 @@ function Dashboard() {
         </h2>
         {nextMission ? (
           <Link to="/missions/$id" params={{ id: String(nextMission.id) }} className="mt-2 block">
-            <Card className="flex items-center gap-3 p-4 active:bg-muted">
+            <Card className="flex items-center gap-3 p-4 transition-colors hover:bg-muted active:bg-muted">
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">
                   {nextMission.match.homeClub?.name ?? "?"} –{" "}
@@ -74,7 +88,7 @@ function Dashboard() {
             À traiter
           </h2>
           <Link to="/missions" className="mt-2 block">
-            <Card className="flex items-center justify-between p-4 active:bg-muted">
+            <Card className="flex items-center justify-between p-4 transition-colors hover:bg-muted active:bg-muted">
               <span className="text-sm">
                 {toRespondCount} mission{toRespondCount > 1 ? "s" : ""} en attente de réponse
               </span>
@@ -88,18 +102,21 @@ function Dashboard() {
 }
 
 function StatTile({
+  icon: Icon,
   label,
   value,
   highlight,
 }: {
+  icon: ComponentType<{ className?: string }>;
   label: string;
   value: number;
   highlight?: boolean;
 }) {
   return (
-    <Card className={`p-3 text-center ${highlight ? "border-amber-500/40" : ""}`}>
+    <Card className={highlight ? "space-y-1.5 p-3 border-amber-500/40" : "space-y-1.5 p-3"}>
+      <Icon className={highlight ? "size-4 text-amber-500" : "size-4 text-muted-foreground"} />
       <p className="font-heading text-2xl font-bold">{value}</p>
-      <p className="mt-1 text-[11px] tracking-wide text-muted-foreground uppercase">{label}</p>
+      <p className="text-[11px] tracking-wide text-muted-foreground uppercase">{label}</p>
     </Card>
   );
 }

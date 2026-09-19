@@ -4,12 +4,13 @@ import { Outlet, createRootRouteWithContext, redirect, useLocation } from "@tans
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
+import { AppSidebar } from "@/components/app-sidebar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/lib/supabase";
 import "../styles.css";
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async ({ location }) => {
@@ -27,13 +28,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { pathname } = useLocation();
-  const showNav =
-    pathname !== "/login" && pathname !== "/signup" && !pathname.startsWith("/evaluate/");
+  const showNav = !PUBLIC_PATHS.includes(pathname) && !pathname.startsWith("/evaluate/");
 
   return (
     <>
-      <main className={showNav ? "pb-20" : undefined}>
-        <Outlet />
+      {showNav && <AppSidebar />}
+      <main className={showNav ? "pb-20 md:pb-0 md:pl-64" : undefined}>
+        {showNav ? (
+          <div className="mx-auto max-w-3xl">
+            <Outlet />
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
       {showNav && <BottomNav />}
       <Toaster />

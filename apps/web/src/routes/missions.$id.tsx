@@ -21,7 +21,15 @@ import {
 } from "@/features/missions/hooks";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, ClipboardCheck, MapPin, Trophy, UserRound, XCircle } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronRight,
+  ClipboardCheck,
+  MapPin,
+  Trophy,
+  UserRound,
+  XCircle,
+} from "lucide-react";
 import { type FormEvent, useState } from "react";
 
 export const Route = createFileRoute("/missions/$id")({
@@ -57,7 +65,7 @@ function MissionDetail() {
   const canCancel = isAdmin && mission.status !== "annulee" && mission.status !== "terminee";
 
   return (
-    <div className="space-y-6 p-6 pb-24">
+    <div className="space-y-6 p-6 pb-24 md:pb-6">
       <div>
         <div className="flex items-start justify-between gap-2">
           <Badge variant={missionStatusVariants[mission.status]}>
@@ -257,16 +265,19 @@ function TargetPlayers({ mission }: { mission: Mission }) {
       <ul className="mt-2 space-y-2">
         {mission.targets.map((target) => (
           <li key={target.id}>
-            <Card className="flex items-center gap-3 p-3">
-              <div className="flex size-9 shrink-0 items-center justify-center border border-border bg-muted">
-                <UserRound className="size-4 text-muted-foreground" />
-              </div>
-              <p className="text-sm">
-                {target.player.firstName ? `${target.player.firstName} ` : ""}
-                <span className="font-medium">{target.player.lastName}</span>
-                {target.player.officialPosition ? ` — ${target.player.officialPosition}` : ""}
-              </p>
-            </Card>
+            <Link to="/players/$id" params={{ id: String(target.player.id) }} className="block">
+              <Card className="flex items-center gap-3 p-3 transition-colors hover:bg-muted active:bg-muted">
+                <div className="flex size-9 shrink-0 items-center justify-center border border-border bg-muted">
+                  <UserRound className="size-4 text-muted-foreground" />
+                </div>
+                <p className="text-sm">
+                  {target.player.firstName ? `${target.player.firstName} ` : ""}
+                  <span className="font-medium">{target.player.lastName}</span>
+                  {target.player.officialPosition ? ` — ${target.player.officialPosition}` : ""}
+                </p>
+                <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground" />
+              </Card>
+            </Link>
           </li>
         ))}
       </ul>

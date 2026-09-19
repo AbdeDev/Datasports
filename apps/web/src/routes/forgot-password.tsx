@@ -2,43 +2,56 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getCurrentUser } from "@/features/auth/api";
 import { supabase } from "@/lib/supabase";
-import { Link, createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { MailCheck } from "lucide-react";
 import { type FormEvent, useState } from "react";
 
-type LoginSearch = { reset?: "success" };
+export const Route = createFileRoute("/forgot-password")({ component: ForgotPassword });
 
-export const Route = createFileRoute("/login")({
-  validateSearch: (search: Record<string, unknown>): LoginSearch => ({
-    reset: search.reset === "success" ? "success" : undefined,
-  }),
-  component: Login,
-});
-
-function Login() {
-  const navigate = useNavigate();
-  const { reset } = useSearch({ from: "/login" });
+function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
 
-    if (signInError) {
-      setIsSubmitting(false);
-      setError(signInError.message);
+    setIsSubmitting(false);
+
+    if (resetError) {
+      setError(resetError.message);
       return;
     }
 
-    const user = await getCurrentUser();
-    navigate({ to: user.role === "admin" ? "/admin" : "/" });
+    // Supabase never reveals whether the email exists, to avoid enumeration
+    // — the same success state is shown either way.
+    setSent(true);
+  }
+
+  if (sent) {
+    return (
+      <div className="flex min-h-svh flex-col items-center justify-center p-6 text-center">
+        <div className="flex size-12 items-center justify-center border border-border bg-muted">
+          <MailCheck className="size-6 text-primary" />
+        </div>
+        <h1 className="mt-4 font-heading text-2xl font-bold">Vérifie tes emails</h1>
+        <p className="mt-3 max-w-sm text-sm text-muted-foreground">
+          Si un compte existe pour <span className="text-foreground">{email}</span>, un lien de
+          réinitialisation vient d'être envoyé.
+        </p>
+        <Link to="/login" className="mt-6">
+          <Button variant="outline">Retour à la connexion</Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -51,18 +64,14 @@ function Login() {
               Elite scouting
             </p>
           </div>
-          <h1 className="mt-2 font-heading text-3xl font-bold">Connexion</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Accède à tes missions de scouting.</p>
+          <h1 className="mt-2 font-heading text-3xl font-bold">Mot de passe oublié</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            On t'envoie un lien pour en choisir un nouveau.
+          </p>
         </div>
 
         <Card>
           <CardContent className="pt-6">
-            {reset === "success" && (
-              <p className="mb-4 border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-500">
-                Mot de passe mis à jour. Connecte-toi avec ton nouveau mot de passe.
-              </p>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -76,26 +85,6 @@ function Login() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Link
-                    to="/forgot-password"
-                    className="text-xs text-muted-foreground underline underline-offset-4"
-                  >
-                    Oublié ?
-                  </Link>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                />
-              </div>
-
               {error && (
                 <p className="border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                   {error}
@@ -103,16 +92,15 @@ function Login() {
               )}
 
               <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
-                {isSubmitting ? "Connexion..." : "Se connecter"}
+                {isSubmitting ? "Envoi..." : "Envoyer le lien"}
               </Button>
 
               <p className="pt-2 text-center text-sm text-muted-foreground">
-                Pas encore de compte ?{" "}
                 <Link
-                  to="/signup"
+                  to="/login"
                   className="font-medium text-foreground underline underline-offset-4"
                 >
-                  S'inscrire
+                  Retour à la connexion
                 </Link>
               </p>
             </form>

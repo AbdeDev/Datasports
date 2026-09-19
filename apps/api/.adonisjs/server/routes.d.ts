@@ -14,6 +14,7 @@ export type ScannedRoutes = {
     'missions.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'missions.add_spotted_player': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'observations.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'observations.validate_analysis': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'evaluation_grids.active': { paramsTuple?: []; params?: {} }
     'clubs.index': { paramsTuple?: []; params?: {} }
     'clubs.store': { paramsTuple?: []; params?: {} }
@@ -57,6 +58,9 @@ export type ScannedRoutes = {
     'clubs.store': { paramsTuple?: []; params?: {} }
     'players.store': { paramsTuple?: []; params?: {} }
     'matches.store': { paramsTuple?: []; params?: {} }
+  }
+  PATCH: {
+    'observations.validate_analysis': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

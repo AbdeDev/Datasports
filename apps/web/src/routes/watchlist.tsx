@@ -1,35 +1,18 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { type Player, playersQueryOptions } from "@/features/players/api";
+import {
+  type Player,
+  playerStatusLabels,
+  playerStatusOrder,
+  playersQueryOptions,
+} from "@/features/players/api";
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { Search, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/watchlist")({ component: Watchlist });
-
-const statusLabels: Record<string, string> = {
-  decouvert: "Découvert",
-  a_observer: "À observer",
-  suivi: "Suivi",
-  prioritaire: "Prioritaire",
-  prise_de_contact: "Prise de contact",
-  contacte: "Contacté",
-  non_retenu: "Non retenu",
-  archive: "Archivé",
-};
-
-const statusOrder = [
-  "prioritaire",
-  "prise_de_contact",
-  "suivi",
-  "a_observer",
-  "decouvert",
-  "contacte",
-  "non_retenu",
-  "archive",
-];
 
 function Watchlist() {
   const { data: players } = useQuery(playersQueryOptions);
@@ -44,7 +27,7 @@ function Watchlist() {
     );
   }, [players, search]);
 
-  const groups = statusOrder
+  const groups = playerStatusOrder
     .map((status) => ({
       status,
       players: filtered?.filter((p) => p.status === status) ?? [],
@@ -75,7 +58,7 @@ function Watchlist() {
         groups.map((group) => (
           <section key={group.status}>
             <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-              {statusLabels[group.status] ?? group.status} ({group.players.length})
+              {playerStatusLabels[group.status] ?? group.status} ({group.players.length})
             </h2>
             <ul className="mt-2 space-y-2">
               {group.players.map((player) => (
@@ -93,21 +76,23 @@ function Watchlist() {
 
 function PlayerRow({ player }: { player: Player }) {
   return (
-    <Card className="flex items-center gap-3 p-3">
-      <div className="flex size-9 shrink-0 items-center justify-center border border-border bg-muted">
-        <UserRound className="size-4 text-muted-foreground" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">
-          {player.firstName ? `${player.firstName} ` : ""}
-          {player.lastName}
-        </p>
-        <p className="truncate text-xs text-muted-foreground">
-          {player.officialPosition ?? "Poste inconnu"}
-          {player.club ? ` · ${player.club.name}` : ""}
-        </p>
-      </div>
-      <Badge variant="outline">{statusLabels[player.status] ?? player.status}</Badge>
-    </Card>
+    <Link to="/players/$id" params={{ id: String(player.id) }} className="block">
+      <Card className="flex items-center gap-3 p-3 transition-colors hover:bg-muted active:bg-muted">
+        <div className="flex size-9 shrink-0 items-center justify-center border border-border bg-muted">
+          <UserRound className="size-4 text-muted-foreground" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">
+            {player.firstName ? `${player.firstName} ` : ""}
+            {player.lastName}
+          </p>
+          <p className="truncate text-xs text-muted-foreground">
+            {player.officialPosition ?? "Poste inconnu"}
+            {player.club ? ` · ${player.club.name}` : ""}
+          </p>
+        </div>
+        <Badge variant="outline">{playerStatusLabels[player.status] ?? player.status}</Badge>
+      </Card>
+    </Link>
   );
 }

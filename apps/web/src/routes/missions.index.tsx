@@ -45,7 +45,7 @@ function MissionCard({ mission }: { mission: Mission }) {
 
   return (
     <Link to="/missions/$id" params={{ id: String(mission.id) }} className="block">
-      <Card className="flex items-center gap-3 p-4 transition-colors active:bg-muted">
+      <Card className="flex items-center gap-3 p-4 transition-colors hover:bg-muted active:bg-muted">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate font-medium">{opponent}</span>

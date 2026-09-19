@@ -5,6 +5,7 @@ import User from "#models/user";
 import env from "#start/env";
 
 const jwks = createRemoteJWKSet(new URL("/auth/v1/.well-known/jwks.json", env.get("SUPABASE_URL")));
+const expectedIssuer = new URL("/auth/v1", env.get("SUPABASE_URL")).toString();
 
 /**
  * Verifies the Supabase-issued JWT sent as a Bearer token, then loads (or
@@ -24,7 +25,11 @@ export default class SupabaseAuthMiddleware {
     let email: string;
 
     try {
-      const { payload } = await jwtVerify(token, jwks, { algorithms: ["ES256"] });
+      const { payload } = await jwtVerify(token, jwks, {
+        algorithms: ["ES256"],
+        issuer: expectedIssuer,
+        audience: "authenticated",
+      });
 
       if (typeof payload.sub !== "string" || typeof payload.email !== "string") {
         return ctx.response.unauthorized({ error: "Invalid token payload" });

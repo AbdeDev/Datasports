@@ -24,3 +24,9 @@ export const createObservationValidator = vine.compile(
       .minLength(1),
   }),
 );
+
+export const validateAnalysisValidator = vine.compile(
+  vine.object({
+    analysisValidated: vine.string().trim().minLength(1),
+  }),
+);

@@ -11,13 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as WatchlistRouteImport } from './routes/watchlist'
 import { Route as EvaluateIdRouteImport } from './routes/evaluate.$id'
 import { Route as MissionsIndexRouteImport } from './routes/missions.index'
 import { Route as MissionsIdRouteImport } from './routes/missions.$id'
+import { Route as PlayersIdRouteImport } from './routes/players.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,6 +32,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -37,6 +45,11 @@ const LoginRoute = LoginRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -64,39 +77,53 @@ const MissionsIdRoute = MissionsIdRouteImport.update({
   path: '/missions/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayersIdRoute = PlayersIdRouteImport.update({
+  id: '/players/$id',
+  path: '/players/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
   '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
+  '/players/$id': typeof PlayersIdRoute
   '/missions/': typeof MissionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
   '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
+  '/players/$id': typeof PlayersIdRoute
   '/missions': typeof MissionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
   '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
+  '/players/$id': typeof PlayersIdRoute
   '/missions/': typeof MissionsIndexRoute
 }
 export interface FileRouteTypes {
@@ -104,46 +131,58 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/forgot-password'
     | '/login'
     | '/profile'
+    | '/reset-password'
     | '/signup'
     | '/watchlist'
     | '/evaluate/$id'
     | '/missions/$id'
+    | '/players/$id'
     | '/missions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
+    | '/forgot-password'
     | '/login'
     | '/profile'
+    | '/reset-password'
     | '/signup'
     | '/watchlist'
     | '/evaluate/$id'
     | '/missions/$id'
+    | '/players/$id'
     | '/missions'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/forgot-password'
     | '/login'
     | '/profile'
+    | '/reset-password'
     | '/signup'
     | '/watchlist'
     | '/evaluate/$id'
     | '/missions/$id'
+    | '/players/$id'
     | '/missions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   WatchlistRoute: typeof WatchlistRoute
   EvaluateIdRoute: typeof EvaluateIdRoute
   MissionsIdRoute: typeof MissionsIdRoute
+  PlayersIdRoute: typeof PlayersIdRoute
   MissionsIndexRoute: typeof MissionsIndexRoute
 }
 
@@ -163,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -175,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -212,18 +265,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MissionsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/players/$id': {
+      id: '/players/$id'
+      path: '/players/$id'
+      fullPath: '/players/$id'
+      preLoaderRoute: typeof PlayersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   WatchlistRoute: WatchlistRoute,
   EvaluateIdRoute: EvaluateIdRoute,
   MissionsIdRoute: MissionsIdRoute,
+  PlayersIdRoute: PlayersIdRoute,
   MissionsIndexRoute: MissionsIndexRoute,
 }
 export const routeTree = rootRouteImport
