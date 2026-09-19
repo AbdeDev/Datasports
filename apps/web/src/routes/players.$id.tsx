@@ -42,7 +42,7 @@ function PlayerSheet() {
   const statusHistoryDesc = [...player.statusHistory].reverse();
 
   return (
-    <div className="space-y-6 p-6 pb-24">
+    <div className="space-y-6 p-6 pb-24 md:pb-6">
       <div>
         <div className="flex items-start justify-between gap-2">
           <Badge variant={statusVariants[player.status] ?? "outline"}>

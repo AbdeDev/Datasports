@@ -2,7 +2,7 @@
 
 Plateforme interne de scouting football — premier produit du groupe Sirius sports-tech.
 
-Élire centralise la détection, l'évaluation et le suivi des joueurs dans le temps, sur mobile comme sur desktop, en remplaçant les carnets/tableurs des scouts par un cycle structuré :
+Elite scouting centralise la détection, l'évaluation et le suivi des joueurs dans le temps, sur mobile comme sur desktop, en remplaçant les carnets/tableurs des scouts par un cycle structuré :
 
 **MISSION → MATCH → OBSERVATION → ÉVALUATION → ANALYSE → SUIVI → PROGRESSION → DÉCISION**
 
@@ -70,6 +70,6 @@ Ne jamais mettre de vraie valeur dans un fichier `.env.example` — voir [DEVELO
 
 - **API** (Render, Docker) : https://dataandsports.onrender.com — `/health` pour vérifier l'état.
 - **Front** (Cloudflare Pages) : https://datasports-29j.pages.dev
-- **Base de données / Auth** : Supabase (projet `elire`).
+- **Base de données / Auth** : Supabase (projet `elite-scouting`).
 
 Le déploiement se fait manuellement depuis la branche `Stagging` une fois une PR mergée — voir [DEVELOPMENT.md](./DEVELOPMENT.md) pour le détail du workflow de branches.

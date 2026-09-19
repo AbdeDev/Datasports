@@ -22,7 +22,7 @@ import { missionQueryOptions } from "@/features/missions/api";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Check, Sparkles, UserRound } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/evaluate/$id")({
   loader: ({ context, params }) =>
@@ -131,32 +131,8 @@ function EvaluateMission() {
   const [submittedObservation, setSubmittedObservation] = useState<Observation | null>(null);
   const createObservation = useCreateObservation(missionId);
 
-  if (submittedObservation) {
-    return (
-      <AnalysisValidation missionId={missionId} idParam={id} observation={submittedObservation} />
-    );
-  }
-
-  if (currentUser && currentUser.role !== "scout") {
-    return (
-      <StatusMessage
-        title="Accès réservé aux scouts"
-        description="Seul le scout assigné peut soumettre une évaluation pour cette mission."
-        missionId={missionId}
-      />
-    );
-  }
-
-  if (mission.status !== "acceptee") {
-    return (
-      <StatusMessage
-        title="Évaluation indisponible"
-        description="Seule une mission acceptée peut être évaluée."
-        missionId={missionId}
-      />
-    );
-  }
-
+  const canEvaluate =
+    !!currentUser && currentUser.role === "scout" && mission.status === "acceptee";
   const step = steps[stepIndex];
   const progress = Math.round(((stepIndex + 1) / steps.length) * 100);
 
@@ -229,6 +205,70 @@ function EvaluateMission() {
       {
         onSuccess: (observation) => setSubmittedObservation(observation),
       },
+    );
+  }
+
+  // Keyboard shortcuts for fast entry: 1-5 scores the current criterion and
+  // advances, Enter goes next/submits, ArrowLeft goes back — all skipped
+  // while typing in a text field so comments aren't disrupted.
+  useEffect(() => {
+    if (!canEvaluate || submittedObservation) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement;
+      const isTextArea = target.tagName === "TEXTAREA";
+      const isTextInput = target.tagName === "INPUT";
+
+      if (step.type === "criterion" && !isTextArea && !isTextInput && /^[1-5]$/.test(event.key)) {
+        updateAnswer(step.criterion.id, { score: Number(event.key) });
+        window.setTimeout(() => goNext(), 150);
+        return;
+      }
+
+      if (event.key === "Enter" && !isTextArea) {
+        event.preventDefault();
+        if (step.type === "review") {
+          handleSubmit();
+        } else if (canGoNext()) {
+          goNext();
+        }
+        return;
+      }
+
+      if (event.key === "ArrowLeft" && !isTextArea && !isTextInput) {
+        goBack();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
+
+  if (submittedObservation) {
+    return (
+      <AnalysisValidation missionId={missionId} idParam={id} observation={submittedObservation} />
+    );
+  }
+
+  if (currentUser && currentUser.role !== "scout") {
+    return (
+      <StatusMessage
+        title="Accès réservé aux scouts"
+        description="Seul le scout assigné peut soumettre une évaluation pour cette mission."
+        missionId={missionId}
+      />
+    );
+  }
+
+  if (mission.status !== "acceptee") {
+    return (
+      <StatusMessage
+        title="Évaluation indisponible"
+        description="Seule une mission acceptée peut être évaluée."
+        missionId={missionId}
+      />
     );
   }
 
@@ -357,6 +397,10 @@ function EvaluateMission() {
                   updateAnswer(step.criterion.id, { comment: event.target.value })
                 }
               />
+              <p className="text-center text-xs text-muted-foreground">
+                Astuce : les touches <kbd className="border border-border px-1">1</kbd>–
+                <kbd className="border border-border px-1">5</kbd> notent et passent à la suite
+              </p>
             </div>
           </StepShell>
         )}

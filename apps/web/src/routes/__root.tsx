@@ -4,6 +4,7 @@ import { Outlet, createRootRouteWithContext, redirect, useLocation } from "@tans
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
+import { AppSidebar } from "@/components/app-sidebar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/lib/supabase";
@@ -31,8 +32,15 @@ function RootComponent() {
 
   return (
     <>
-      <main className={showNav ? "pb-20" : undefined}>
-        <Outlet />
+      {showNav && <AppSidebar />}
+      <main className={showNav ? "pb-20 md:pb-0 md:pl-64" : undefined}>
+        {showNav ? (
+          <div className="mx-auto max-w-3xl">
+            <Outlet />
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
       {showNav && <BottomNav />}
       <Toaster />

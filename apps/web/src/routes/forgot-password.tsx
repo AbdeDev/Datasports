@@ -58,9 +58,12 @@ function ForgotPassword() {
     <div className="flex min-h-svh flex-col items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-            Élire
-          </p>
+          <div className="flex items-center justify-center gap-2">
+            <span className="size-2 bg-primary" />
+            <p className="text-xs font-semibold tracking-[0.2em] text-primary uppercase">
+              Elite scouting
+            </p>
+          </div>
           <h1 className="mt-2 font-heading text-3xl font-bold">Mot de passe oublié</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             On t'envoie un lien pour en choisir un nouveau.

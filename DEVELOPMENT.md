@@ -1,6 +1,6 @@
 # Guide de développement
 
-Ce document complète le [README](./README.md) : workflow git, conventions de code et pièges connus pour contribuer à Élire.
+Ce document complète le [README](./README.md) : workflow git, conventions de code et pièges connus pour contribuer à Elite scouting.
 
 ## Workflow git
 

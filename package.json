@@ -1,5 +1,5 @@
 {
-  "name": "elire",
+  "name": "elite-scouting",
   "private": true,
   "workspaces": ["apps/*"],
   "engines": {

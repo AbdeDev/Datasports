@@ -42,7 +42,7 @@ function AdminDashboard() {
   const alerts = missions?.filter((m) => ALERT_STATUSES.includes(m.status)) ?? [];
 
   return (
-    <div className="space-y-8 p-6 pb-24">
+    <div className="space-y-8 p-6 pb-24 md:pb-6">
       <h1 className="font-heading text-2xl font-bold">Pilotage</h1>
 
       {alerts.length > 0 && (

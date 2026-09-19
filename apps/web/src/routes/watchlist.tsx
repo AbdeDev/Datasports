@@ -77,7 +77,7 @@ function Watchlist() {
 function PlayerRow({ player }: { player: Player }) {
   return (
     <Link to="/players/$id" params={{ id: String(player.id) }} className="block">
-      <Card className="flex items-center gap-3 p-3">
+      <Card className="flex items-center gap-3 p-3 transition-colors hover:bg-muted active:bg-muted">
         <div className="flex size-9 shrink-0 items-center justify-center border border-border bg-muted">
           <UserRound className="size-4 text-muted-foreground" />
         </div>
