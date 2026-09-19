@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/lib/supabase";
 import "../styles.css";
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"];
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async ({ location }) => {
@@ -27,8 +27,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { pathname } = useLocation();
-  const showNav =
-    pathname !== "/login" && pathname !== "/signup" && !pathname.startsWith("/evaluate/");
+  const showNav = !PUBLIC_PATHS.includes(pathname) && !pathname.startsWith("/evaluate/");
 
   return (
     <>
