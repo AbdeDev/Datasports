@@ -1,18 +1,27 @@
-import { type AccessToken, DbAccessTokensProvider } from "@adonisjs/auth/access_tokens";
-import { withAuthFinder } from "@adonisjs/auth/mixins/lucid";
-import { compose } from "@adonisjs/core/helpers";
-import hash from "@adonisjs/core/services/hash";
-import { UserSchema } from "#database/schema";
+import { BaseModel, column } from "@adonisjs/lucid/orm";
+import type { DateTime } from "luxon";
 
-export default class User extends compose(UserSchema, withAuthFinder(hash)) {
-  static accessTokens = DbAccessTokensProvider.forModel(User);
-  declare currentAccessToken?: AccessToken;
+export type UserRole = "scout" | "admin";
 
-  get initials() {
-    const [first, last] = this.fullName ? this.fullName.split(" ") : this.email.split("@");
-    if (first && last) {
-      return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
-    }
-    return `${first.slice(0, 2)}`.toUpperCase();
-  }
+export default class User extends BaseModel {
+  @column({ isPrimary: true })
+  declare id: number;
+
+  @column()
+  declare supabaseUserId: string;
+
+  @column()
+  declare email: string;
+
+  @column()
+  declare fullName: string | null;
+
+  @column()
+  declare role: UserRole;
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime;
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null;
 }
