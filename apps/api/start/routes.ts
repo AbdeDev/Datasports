@@ -20,6 +20,17 @@ router.get("/health", () => {
 
 router
   .group(() => {
-    router.get("me", "#controllers/me_controller.show").use(middleware.auth());
+    router.get("me", "#controllers/me_controller.show");
+
+    router
+      .group(() => {
+        router.get("/", "#controllers/missions_controller.index");
+        router.get(":id", "#controllers/missions_controller.show");
+        router.post("/", "#controllers/missions_controller.store");
+        router.post(":id/respond", "#controllers/missions_controller.respond");
+        router.post(":id/reassign", "#controllers/missions_controller.reassign");
+      })
+      .prefix("missions");
   })
-  .prefix("/api/v1");
+  .prefix("/api/v1")
+  .use(middleware.auth());
