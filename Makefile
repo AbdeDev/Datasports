@@ -18,9 +18,8 @@ test:
 build:
 	bun run build
 
-# Ces deux cibles ne fonctionneront qu'à partir de l'étape 2 (apps/api créée)
 db-migrate:
-	bun --filter api ace migration:run
+	cd apps/api && node ace migration:run
 
 db-seed:
-	bun --filter api ace db:seed
+	cd apps/api && node ace db:seed
