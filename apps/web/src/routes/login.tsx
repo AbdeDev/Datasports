@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { getCurrentUser } from "@/features/auth/api";
 import { supabase } from "@/lib/supabase";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
@@ -26,7 +27,8 @@ function Login() {
       return;
     }
 
-    navigate({ to: "/" });
+    const user = await getCurrentUser();
+    navigate({ to: user.role === "admin" ? "/admin" : "/" });
   }
 
   return (
