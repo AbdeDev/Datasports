@@ -1,12 +1,10 @@
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { RouterProvider } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
-import { routeTree } from "./routeTree.gen";
+import { queryClient } from "./lib/query";
+import { getRouter } from "./router";
 
-const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
-  scrollRestoration: true,
-});
+const router = getRouter();
 
 declare module "@tanstack/react-router" {
   interface Register {
@@ -21,5 +19,9 @@ if (!rootElement) {
 
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
-  root.render(<RouterProvider router={router} />);
+  root.render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
 }
