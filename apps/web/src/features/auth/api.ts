@@ -6,6 +6,7 @@ export type CurrentUser = {
   email: string;
   fullName: string | null;
   role: "scout" | "admin";
+  createdAt: string;
 };
 
 export function getCurrentUser() {

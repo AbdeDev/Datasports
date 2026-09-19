@@ -5,6 +5,7 @@ import MissionService, {
 } from "#services/mission_service";
 import {
   addSpottedPlayerValidator,
+  cancelMissionValidator,
   createMissionValidator,
   reassignMissionValidator,
   respondMissionValidator,
@@ -88,6 +89,20 @@ export default class MissionsController {
 
     try {
       return await missionService.addSpottedPlayer(Number(params.id), authUser, payload);
+    } catch (error) {
+      return this.handleError(error, response);
+    }
+  }
+
+  async cancel({ authUser, params, request, response }: HttpContext) {
+    if (authUser.role !== "admin") {
+      return response.forbidden({ error: "Only an admin can cancel a mission" });
+    }
+
+    const payload = await request.validateUsing(cancelMissionValidator);
+
+    try {
+      return await missionService.cancel(Number(params.id), payload.reason, authUser);
     } catch (error) {
       return this.handleError(error, response);
     }

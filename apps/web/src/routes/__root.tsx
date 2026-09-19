@@ -5,6 +5,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 import { BottomNav } from "@/components/bottom-nav";
+import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/lib/supabase";
 import "../styles.css";
 
@@ -34,6 +35,7 @@ function RootComponent() {
         <Outlet />
       </main>
       {showNav && <BottomNav />}
+      <Toaster />
       <TanStackDevtools
         config={{
           position: "bottom-right",

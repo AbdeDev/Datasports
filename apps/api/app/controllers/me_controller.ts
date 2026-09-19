@@ -7,6 +7,7 @@ export default class MeController {
       email: authUser.email,
       fullName: authUser.fullName,
       role: authUser.role,
+      createdAt: authUser.createdAt,
     };
   }
 }

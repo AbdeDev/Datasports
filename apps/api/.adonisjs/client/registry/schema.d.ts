@@ -91,6 +91,18 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'missions.cancel': {
+    methods: ["POST"]
+    pattern: '/api/v1/missions/:id/cancel'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'missions.add_spotted_player': {
     methods: ["POST"]
     pattern: '/api/v1/missions/:id/targets'

@@ -12,6 +12,7 @@ export interface ApiDefinition {
     respond: typeof routes['missions.respond']
     reassign: typeof routes['missions.reassign']
     withdraw: typeof routes['missions.withdraw']
+    cancel: typeof routes['missions.cancel']
     addSpottedPlayer: typeof routes['missions.add_spotted_player']
   }
   clubs: {

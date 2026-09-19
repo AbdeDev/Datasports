@@ -48,6 +48,12 @@ const routes = {
     tokens: [{"old":"/api/v1/missions/:id/withdraw","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/withdraw","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/withdraw","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/withdraw","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/withdraw","type":0,"val":"withdraw","end":""}],
     types: placeholder as Registry['missions.withdraw']['types'],
   },
+  'missions.cancel': {
+    methods: ["POST"],
+    pattern: '/api/v1/missions/:id/cancel',
+    tokens: [{"old":"/api/v1/missions/:id/cancel","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/cancel","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/cancel","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/cancel","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/cancel","type":0,"val":"cancel","end":""}],
+    types: placeholder as Registry['missions.cancel']['types'],
+  },
   'missions.add_spotted_player': {
     methods: ["POST"],
     pattern: '/api/v1/missions/:id/targets',
