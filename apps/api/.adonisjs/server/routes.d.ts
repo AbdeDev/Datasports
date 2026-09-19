@@ -10,6 +10,8 @@ export type ScannedRoutes = {
     'missions.store': { paramsTuple?: []; params?: {} }
     'missions.respond': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'missions.reassign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'missions.withdraw': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'missions.add_spotted_player': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clubs.index': { paramsTuple?: []; params?: {} }
     'clubs.store': { paramsTuple?: []; params?: {} }
     'players.index': { paramsTuple?: []; params?: {} }
@@ -43,6 +45,8 @@ export type ScannedRoutes = {
     'missions.store': { paramsTuple?: []; params?: {} }
     'missions.respond': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'missions.reassign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'missions.withdraw': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'missions.add_spotted_player': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clubs.store': { paramsTuple?: []; params?: {} }
     'players.store': { paramsTuple?: []; params?: {} }
     'matches.store': { paramsTuple?: []; params?: {} }

@@ -42,6 +42,18 @@ const routes = {
     tokens: [{"old":"/api/v1/missions/:id/reassign","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/reassign","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/reassign","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/reassign","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/reassign","type":0,"val":"reassign","end":""}],
     types: placeholder as Registry['missions.reassign']['types'],
   },
+  'missions.withdraw': {
+    methods: ["POST"],
+    pattern: '/api/v1/missions/:id/withdraw',
+    tokens: [{"old":"/api/v1/missions/:id/withdraw","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/withdraw","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/withdraw","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/withdraw","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/withdraw","type":0,"val":"withdraw","end":""}],
+    types: placeholder as Registry['missions.withdraw']['types'],
+  },
+  'missions.add_spotted_player': {
+    methods: ["POST"],
+    pattern: '/api/v1/missions/:id/targets',
+    tokens: [{"old":"/api/v1/missions/:id/targets","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/targets","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/targets","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/targets","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/targets","type":0,"val":"targets","end":""}],
+    types: placeholder as Registry['missions.add_spotted_player']['types'],
+  },
   'clubs.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/clubs',

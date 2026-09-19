@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import Mission from "#models/mission";
 import MissionTarget from "#models/mission_target";
+import Player from "#models/player";
 import type User from "#models/user";
 
 class MissionForbiddenError extends Error {}
@@ -65,7 +66,10 @@ export default class MissionService {
       throw new MissionForbiddenError("This mission does not belong to you");
     }
 
-    if (mission.status !== "proposee") {
+    // A scout who withdrew (scout_indisponible) can still change their mind
+    // and re-accept — as long as it hasn't been reassigned away from them
+    // yet (the ownership check above already guarantees that).
+    if (!["proposee", "scout_indisponible"].includes(mission.status)) {
       throw new MissionConflictError("This mission is not awaiting a response");
     }
 
@@ -80,7 +84,7 @@ export default class MissionService {
   async reassign(missionId: number, newScoutId: number, admin: User) {
     const mission = await Mission.findOrFail(missionId);
 
-    if (!["proposee", "a_reattribuer"].includes(mission.status)) {
+    if (!["proposee", "a_reattribuer", "scout_indisponible"].includes(mission.status)) {
       throw new MissionConflictError("Only a pending or unassigned mission can be reassigned");
     }
 
@@ -91,5 +95,51 @@ export default class MissionService {
     await mission.save();
 
     return this.findForUser(mission.id, admin);
+  }
+
+  /**
+   * A scout backing out of a mission they had already accepted — distinct
+   * from an initial decline (brief §10 status list separates "Scout
+   * indisponible" from "À réattribuer").
+   */
+  async withdraw(missionId: number, scout: User, reason?: string) {
+    const mission = await Mission.findOrFail(missionId);
+
+    if (mission.scoutId !== scout.id) {
+      throw new MissionForbiddenError("This mission does not belong to you");
+    }
+
+    if (mission.status !== "acceptee") {
+      throw new MissionConflictError("Only an accepted mission can be withdrawn from");
+    }
+
+    mission.status = "scout_indisponible";
+    mission.declineReason = reason ?? null;
+    mission.respondedAt = DateTime.now();
+    await mission.save();
+
+    return this.findForUser(mission.id, scout);
+  }
+
+  /**
+   * "+ Joueur repéré" (brief §10): the scout spots and quick-creates a
+   * player during the match, attached to the current mission's targets.
+   * Nom/prénom/poste/club are all required here (product decision).
+   */
+  async addSpottedPlayer(
+    missionId: number,
+    scout: User,
+    playerData: { firstName: string; lastName: string; officialPosition: string; clubId: number },
+  ) {
+    const mission = await Mission.findOrFail(missionId);
+
+    if (mission.scoutId !== scout.id) {
+      throw new MissionForbiddenError("This mission does not belong to you");
+    }
+
+    const player = await Player.create({ ...playerData, status: "decouvert" });
+    await MissionTarget.create({ missionId: mission.id, playerId: player.id });
+
+    return this.findForUser(mission.id, scout);
   }
 }

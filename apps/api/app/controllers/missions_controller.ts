@@ -4,9 +4,11 @@ import MissionService, {
   MissionForbiddenError,
 } from "#services/mission_service";
 import {
+  addSpottedPlayerValidator,
   createMissionValidator,
   reassignMissionValidator,
   respondMissionValidator,
+  withdrawMissionValidator,
 } from "#validators/mission";
 
 const missionService = new MissionService();
@@ -58,6 +60,34 @@ export default class MissionsController {
 
     try {
       return await missionService.reassign(Number(params.id), payload.scoutId, authUser);
+    } catch (error) {
+      return this.handleError(error, response);
+    }
+  }
+
+  async withdraw({ authUser, params, request, response }: HttpContext) {
+    if (authUser.role !== "scout") {
+      return response.forbidden({ error: "Only a scout can withdraw from a mission" });
+    }
+
+    const payload = await request.validateUsing(withdrawMissionValidator);
+
+    try {
+      return await missionService.withdraw(Number(params.id), authUser, payload.reason);
+    } catch (error) {
+      return this.handleError(error, response);
+    }
+  }
+
+  async addSpottedPlayer({ authUser, params, request, response }: HttpContext) {
+    if (authUser.role !== "scout") {
+      return response.forbidden({ error: "Only a scout can add a spotted player" });
+    }
+
+    const payload = await request.validateUsing(addSpottedPlayerValidator);
+
+    try {
+      return await missionService.addSpottedPlayer(Number(params.id), authUser, payload);
     } catch (error) {
       return this.handleError(error, response);
     }

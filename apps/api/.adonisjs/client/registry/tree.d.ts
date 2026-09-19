@@ -11,6 +11,8 @@ export interface ApiDefinition {
     store: typeof routes['missions.store']
     respond: typeof routes['missions.respond']
     reassign: typeof routes['missions.reassign']
+    withdraw: typeof routes['missions.withdraw']
+    addSpottedPlayer: typeof routes['missions.add_spotted_player']
   }
   clubs: {
     index: typeof routes['clubs.index']

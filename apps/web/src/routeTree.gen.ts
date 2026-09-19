@@ -12,10 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as WatchlistRouteImport } from './routes/watchlist'
+import { Route as MissionsIndexRouteImport } from './routes/missions.index'
+import { Route as MissionsIdRouteImport } from './routes/missions.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,11 +31,6 @@ const AdminRoute = AdminRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MissionsRoute = MissionsRouteImport.update({
-  id: '/missions',
-  path: '/missions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -52,34 +48,47 @@ const WatchlistRoute = WatchlistRouteImport.update({
   path: '/watchlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MissionsIndexRoute = MissionsIndexRouteImport.update({
+  id: '/missions/',
+  path: '/missions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MissionsIdRoute = MissionsIdRouteImport.update({
+  id: '/missions/$id',
+  path: '/missions/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/login': typeof LoginRoute
-  '/missions': typeof MissionsRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
+  '/missions/$id': typeof MissionsIdRoute
+  '/missions/': typeof MissionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/login': typeof LoginRoute
-  '/missions': typeof MissionsRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
+  '/missions/$id': typeof MissionsIdRoute
+  '/missions': typeof MissionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/login': typeof LoginRoute
-  '/missions': typeof MissionsRoute
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
+  '/missions/$id': typeof MissionsIdRoute
+  '/missions/': typeof MissionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,38 +96,42 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/login'
-    | '/missions'
     | '/profile'
     | '/signup'
     | '/watchlist'
+    | '/missions/$id'
+    | '/missions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/login'
-    | '/missions'
     | '/profile'
     | '/signup'
     | '/watchlist'
+    | '/missions/$id'
+    | '/missions'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/login'
-    | '/missions'
     | '/profile'
     | '/signup'
     | '/watchlist'
+    | '/missions/$id'
+    | '/missions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   LoginRoute: typeof LoginRoute
-  MissionsRoute: typeof MissionsRoute
   ProfileRoute: typeof ProfileRoute
   SignupRoute: typeof SignupRoute
   WatchlistRoute: typeof WatchlistRoute
+  MissionsIdRoute: typeof MissionsIdRoute
+  MissionsIndexRoute: typeof MissionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -144,13 +157,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/missions': {
-      id: '/missions'
-      path: '/missions'
-      fullPath: '/missions'
-      preLoaderRoute: typeof MissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -172,6 +178,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WatchlistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/missions/': {
+      id: '/missions/'
+      path: '/missions'
+      fullPath: '/missions/'
+      preLoaderRoute: typeof MissionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/missions/$id': {
+      id: '/missions/$id'
+      path: '/missions/$id'
+      fullPath: '/missions/$id'
+      preLoaderRoute: typeof MissionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -179,10 +199,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   LoginRoute: LoginRoute,
-  MissionsRoute: MissionsRoute,
   ProfileRoute: ProfileRoute,
   SignupRoute: SignupRoute,
   WatchlistRoute: WatchlistRoute,
+  MissionsIdRoute: MissionsIdRoute,
+  MissionsIndexRoute: MissionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
