@@ -20,8 +20,8 @@ import {
   useWithdrawMission,
 } from "@/features/missions/hooks";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, MapPin, Trophy, UserRound, XCircle } from "lucide-react";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { CalendarDays, ClipboardCheck, MapPin, Trophy, UserRound, XCircle } from "lucide-react";
 import { type FormEvent, useState } from "react";
 
 export const Route = createFileRoute("/missions/$id")({
@@ -45,10 +45,14 @@ function MissionDetail() {
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
   const [showCancelForm, setShowCancelForm] = useState(false);
 
-  // Withdrawing doesn't lose the mission — the scout can still change their
-  // mind and re-accept as long as it hasn't been reassigned to someone else.
+  // Declining or withdrawing doesn't lose the mission — the scout can still
+  // change their mind and respond again as long as it hasn't been
+  // reassigned to someone else.
   const canRespond =
-    isScout && (mission.status === "proposee" || mission.status === "scout_indisponible");
+    isScout &&
+    (mission.status === "proposee" ||
+      mission.status === "a_reattribuer" ||
+      mission.status === "scout_indisponible");
   const canWithdraw = isScout && mission.status === "acceptee";
   const canCancel = isAdmin && mission.status !== "annulee" && mission.status !== "terminee";
 
@@ -108,7 +112,12 @@ function MissionDetail() {
           confirmLabel="Confirmer l'annulation"
           isPending={cancel.isPending}
           onCancel={() => setShowCancelForm(false)}
-          onConfirm={(value) => cancel.mutate({ reason: value || undefined })}
+          onConfirm={(value) =>
+            cancel.mutate(
+              { reason: value || undefined },
+              { onSuccess: () => setShowCancelForm(false) },
+            )
+          }
         />
       )}
 
@@ -147,7 +156,10 @@ function MissionDetail() {
               isPending={respond.isPending}
               onCancel={() => setShowDeclineForm(false)}
               onConfirm={(value) =>
-                respond.mutate({ decision: "decline", declineReason: value || undefined })
+                respond.mutate(
+                  { decision: "decline", declineReason: value || undefined },
+                  { onSuccess: () => setShowDeclineForm(false) },
+                )
               }
             />
           )}
@@ -171,10 +183,24 @@ function MissionDetail() {
               confirmLabel="Confirmer le désistement"
               isPending={withdraw.isPending}
               onCancel={() => setShowWithdrawForm(false)}
-              onConfirm={(value) => withdraw.mutate({ reason: value || undefined })}
+              onConfirm={(value) =>
+                withdraw.mutate(
+                  { reason: value || undefined },
+                  { onSuccess: () => setShowWithdrawForm(false) },
+                )
+              }
             />
           )}
         </section>
+      )}
+
+      {isScout && mission.status === "acceptee" && (
+        <Link to="/evaluate/$id" params={{ id }}>
+          <Button size="lg" className="w-full">
+            <ClipboardCheck className="size-4" />
+            Évaluer le joueur
+          </Button>
+        </Link>
       )}
 
       {isScout && <SpottedPlayerForm missionId={missionId} />}

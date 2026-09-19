@@ -60,6 +60,18 @@ const routes = {
     tokens: [{"old":"/api/v1/missions/:id/targets","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/targets","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/targets","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/targets","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/targets","type":0,"val":"targets","end":""}],
     types: placeholder as Registry['missions.add_spotted_player']['types'],
   },
+  'observations.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/missions/:id/observations',
+    tokens: [{"old":"/api/v1/missions/:id/observations","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/observations","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/observations","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/observations","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/observations","type":0,"val":"observations","end":""}],
+    types: placeholder as Registry['observations.store']['types'],
+  },
+  'evaluation_grids.active': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/evaluation-grids/active',
+    tokens: [{"old":"/api/v1/evaluation-grids/active","type":0,"val":"api","end":""},{"old":"/api/v1/evaluation-grids/active","type":0,"val":"v1","end":""},{"old":"/api/v1/evaluation-grids/active","type":0,"val":"evaluation-grids","end":""},{"old":"/api/v1/evaluation-grids/active","type":0,"val":"active","end":""}],
+    types: placeholder as Registry['evaluation_grids.active']['types'],
+  },
   'clubs.index': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/clubs',

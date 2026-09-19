@@ -5,9 +5,11 @@
 
 export const controllers = {
   Clubs: () => import('#controllers/clubs_controller'),
+  EvaluationGrids: () => import('#controllers/evaluation_grids_controller'),
   Matches: () => import('#controllers/matches_controller'),
   Me: () => import('#controllers/me_controller'),
   Missions: () => import('#controllers/missions_controller'),
+  Observations: () => import('#controllers/observations_controller'),
   Players: () => import('#controllers/players_controller'),
   Scouts: () => import('#controllers/scouts_controller'),
 }

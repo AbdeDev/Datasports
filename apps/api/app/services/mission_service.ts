@@ -66,10 +66,11 @@ export default class MissionService {
       throw new MissionForbiddenError("This mission does not belong to you");
     }
 
-    // A scout who withdrew (scout_indisponible) can still change their mind
-    // and re-accept — as long as it hasn't been reassigned away from them
-    // yet (the ownership check above already guarantees that).
-    if (!["proposee", "scout_indisponible"].includes(mission.status)) {
+    // A scout who declined (a_reattribuer) or withdrew (scout_indisponible)
+    // can still change their mind and respond again — as long as it hasn't
+    // been reassigned away from them yet (the ownership check above already
+    // guarantees that).
+    if (!["proposee", "a_reattribuer", "scout_indisponible"].includes(mission.status)) {
       throw new MissionConflictError("This mission is not awaiting a response");
     }
 

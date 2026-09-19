@@ -13,6 +13,8 @@ export type ScannedRoutes = {
     'missions.withdraw': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'missions.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'missions.add_spotted_player': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'observations.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'evaluation_grids.active': { paramsTuple?: []; params?: {} }
     'clubs.index': { paramsTuple?: []; params?: {} }
     'clubs.store': { paramsTuple?: []; params?: {} }
     'players.index': { paramsTuple?: []; params?: {} }
@@ -26,6 +28,7 @@ export type ScannedRoutes = {
     'me.show': { paramsTuple?: []; params?: {} }
     'missions.index': { paramsTuple?: []; params?: {} }
     'missions.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'evaluation_grids.active': { paramsTuple?: []; params?: {} }
     'clubs.index': { paramsTuple?: []; params?: {} }
     'players.index': { paramsTuple?: []; params?: {} }
     'players.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -36,6 +39,7 @@ export type ScannedRoutes = {
     'me.show': { paramsTuple?: []; params?: {} }
     'missions.index': { paramsTuple?: []; params?: {} }
     'missions.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'evaluation_grids.active': { paramsTuple?: []; params?: {} }
     'clubs.index': { paramsTuple?: []; params?: {} }
     'players.index': { paramsTuple?: []; params?: {} }
     'players.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -49,6 +53,7 @@ export type ScannedRoutes = {
     'missions.withdraw': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'missions.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'missions.add_spotted_player': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'observations.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clubs.store': { paramsTuple?: []; params?: {} }
     'players.store': { paramsTuple?: []; params?: {} }
     'matches.store': { paramsTuple?: []; params?: {} }

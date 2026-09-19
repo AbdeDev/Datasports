@@ -27,7 +27,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { pathname } = useLocation();
-  const showNav = pathname !== "/login" && pathname !== "/signup";
+  const showNav =
+    pathname !== "/login" && pathname !== "/signup" && !pathname.startsWith("/evaluate/");
 
   return (
     <>
