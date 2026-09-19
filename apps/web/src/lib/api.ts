@@ -2,6 +2,16 @@ import { supabase } from "./supabase";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
@@ -16,7 +26,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    const message = await response
+      .json()
+      .then((body) => (typeof body?.error === "string" ? body.error : null))
+      .catch(() => null);
+
+    throw new ApiError(message ?? `Une erreur est survenue (${response.status})`, response.status);
   }
 
   return response.json() as Promise<T>;

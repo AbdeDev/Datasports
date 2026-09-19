@@ -122,6 +122,26 @@ export default class MissionService {
   }
 
   /**
+   * Admin cancellation. Sets status to "annulee" rather than deleting the
+   * row — missions (and any observations already attached) are never
+   * destroyed, consistent with the append-only philosophy of the rest of
+   * the domain (brief §11).
+   */
+  async cancel(missionId: number, reason: string | undefined, admin: User) {
+    const mission = await Mission.findOrFail(missionId);
+
+    if (["annulee", "terminee"].includes(mission.status)) {
+      throw new MissionConflictError("This mission can no longer be cancelled");
+    }
+
+    mission.status = "annulee";
+    mission.declineReason = reason ?? null;
+    await mission.save();
+
+    return this.findForUser(mission.id, admin);
+  }
+
+  /**
    * "+ Joueur repéré" (brief §10): the scout spots and quick-creates a
    * player during the match, attached to the current mission's targets.
    * Nom/prénom/poste/club are all required here (product decision).

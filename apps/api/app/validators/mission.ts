@@ -27,6 +27,12 @@ export const withdrawMissionValidator = vine.compile(
   }),
 );
 
+export const cancelMissionValidator = vine.compile(
+  vine.object({
+    reason: vine.string().trim().optional(),
+  }),
+);
+
 // Unlike the brief's default (partial info allowed), the user wants every
 // field required for a spotted player: nom, prénom, poste, club.
 export const addSpottedPlayerValidator = vine.compile(

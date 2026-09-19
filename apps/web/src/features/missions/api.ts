@@ -22,6 +22,20 @@ export const missionStatusLabels: Record<MissionStatus, string> = {
   annulee: "Annulée",
 };
 
+export const missionStatusVariants: Record<
+  MissionStatus,
+  "default" | "secondary" | "outline" | "muted" | "success" | "warning" | "destructive"
+> = {
+  proposee: "outline",
+  acceptee: "success",
+  a_venir: "outline",
+  evaluation_a_completer: "warning",
+  terminee: "secondary",
+  scout_indisponible: "warning",
+  a_reattribuer: "warning",
+  annulee: "destructive",
+};
+
 export type Club = { id: number; name: string; country: string | null };
 
 export type PlayerSummary = {
@@ -80,6 +94,18 @@ export function addSpottedPlayer(
   data: { firstName: string; lastName: string; officialPosition: string; clubId: number },
 ) {
   return api.post<Mission>(`/api/v1/missions/${id}/targets`, data);
+}
+
+export function cancelMission(id: number, data: { reason?: string }) {
+  return api.post<Mission>(`/api/v1/missions/${id}/cancel`, data);
+}
+
+export function createMission(data: { matchId: number; scoutId: number; playerIds: number[] }) {
+  return api.post<Mission>("/api/v1/missions", data);
+}
+
+export function reassignMission(id: number, data: { scoutId: number }) {
+  return api.post<Mission>(`/api/v1/missions/${id}/reassign`, data);
 }
 
 export const missionsQueryOptions = queryOptions({

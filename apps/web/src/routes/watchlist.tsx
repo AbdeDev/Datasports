@@ -1,14 +1,113 @@
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { type Player, playersQueryOptions } from "@/features/players/api";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { Search, UserRound } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/watchlist")({ component: Watchlist });
 
+const statusLabels: Record<string, string> = {
+  decouvert: "Découvert",
+  a_observer: "À observer",
+  suivi: "Suivi",
+  prioritaire: "Prioritaire",
+  prise_de_contact: "Prise de contact",
+  contacte: "Contacté",
+  non_retenu: "Non retenu",
+  archive: "Archivé",
+};
+
+const statusOrder = [
+  "prioritaire",
+  "prise_de_contact",
+  "suivi",
+  "a_observer",
+  "decouvert",
+  "contacte",
+  "non_retenu",
+  "archive",
+];
+
 function Watchlist() {
+  const { data: players } = useQuery(playersQueryOptions);
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    if (!players) return players;
+    const query = search.trim().toLowerCase();
+    if (!query) return players;
+    return players.filter((p) =>
+      `${p.firstName ?? ""} ${p.lastName} ${p.club?.name ?? ""}`.toLowerCase().includes(query),
+    );
+  }, [players, search]);
+
+  const groups = statusOrder
+    .map((status) => ({
+      status,
+      players: filtered?.filter((p) => p.status === status) ?? [],
+    }))
+    .filter((group) => group.players.length > 0);
+
   return (
-    <div className="p-6">
+    <div className="space-y-6 p-6">
       <h1 className="font-heading text-2xl font-bold">Watchlist</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Joueurs suivis, groupés par statut — à venir.
-      </p>
+
+      {players && players.length > 0 && (
+        <div className="relative">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher un joueur, un club..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            className="pl-9"
+          />
+        </div>
+      )}
+
+      {!players || players.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Aucun joueur suivi pour l'instant.</p>
+      ) : groups.length === 0 ? (
+        <p className="text-sm text-muted-foreground">Aucun résultat pour "{search}".</p>
+      ) : (
+        groups.map((group) => (
+          <section key={group.status}>
+            <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+              {statusLabels[group.status] ?? group.status} ({group.players.length})
+            </h2>
+            <ul className="mt-2 space-y-2">
+              {group.players.map((player) => (
+                <li key={player.id}>
+                  <PlayerRow player={player} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      )}
     </div>
+  );
+}
+
+function PlayerRow({ player }: { player: Player }) {
+  return (
+    <Card className="flex items-center gap-3 p-3">
+      <div className="flex size-9 shrink-0 items-center justify-center border border-border bg-muted">
+        <UserRound className="size-4 text-muted-foreground" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">
+          {player.firstName ? `${player.firstName} ` : ""}
+          {player.lastName}
+        </p>
+        <p className="truncate text-xs text-muted-foreground">
+          {player.officialPosition ?? "Poste inconnu"}
+          {player.club ? ` · ${player.club.name}` : ""}
+        </p>
+      </div>
+      <Badge variant="outline">{statusLabels[player.status] ?? player.status}</Badge>
+    </Card>
   );
 }
