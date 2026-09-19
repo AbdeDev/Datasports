@@ -42,6 +42,54 @@ const routes = {
     tokens: [{"old":"/api/v1/missions/:id/reassign","type":0,"val":"api","end":""},{"old":"/api/v1/missions/:id/reassign","type":0,"val":"v1","end":""},{"old":"/api/v1/missions/:id/reassign","type":0,"val":"missions","end":""},{"old":"/api/v1/missions/:id/reassign","type":1,"val":"id","end":""},{"old":"/api/v1/missions/:id/reassign","type":0,"val":"reassign","end":""}],
     types: placeholder as Registry['missions.reassign']['types'],
   },
+  'clubs.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/clubs',
+    tokens: [{"old":"/api/v1/clubs","type":0,"val":"api","end":""},{"old":"/api/v1/clubs","type":0,"val":"v1","end":""},{"old":"/api/v1/clubs","type":0,"val":"clubs","end":""}],
+    types: placeholder as Registry['clubs.index']['types'],
+  },
+  'clubs.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/clubs',
+    tokens: [{"old":"/api/v1/clubs","type":0,"val":"api","end":""},{"old":"/api/v1/clubs","type":0,"val":"v1","end":""},{"old":"/api/v1/clubs","type":0,"val":"clubs","end":""}],
+    types: placeholder as Registry['clubs.store']['types'],
+  },
+  'players.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/players',
+    tokens: [{"old":"/api/v1/players","type":0,"val":"api","end":""},{"old":"/api/v1/players","type":0,"val":"v1","end":""},{"old":"/api/v1/players","type":0,"val":"players","end":""}],
+    types: placeholder as Registry['players.index']['types'],
+  },
+  'players.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/players/:id',
+    tokens: [{"old":"/api/v1/players/:id","type":0,"val":"api","end":""},{"old":"/api/v1/players/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/players/:id","type":0,"val":"players","end":""},{"old":"/api/v1/players/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['players.show']['types'],
+  },
+  'players.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/players',
+    tokens: [{"old":"/api/v1/players","type":0,"val":"api","end":""},{"old":"/api/v1/players","type":0,"val":"v1","end":""},{"old":"/api/v1/players","type":0,"val":"players","end":""}],
+    types: placeholder as Registry['players.store']['types'],
+  },
+  'matches.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/matches',
+    tokens: [{"old":"/api/v1/matches","type":0,"val":"api","end":""},{"old":"/api/v1/matches","type":0,"val":"v1","end":""},{"old":"/api/v1/matches","type":0,"val":"matches","end":""}],
+    types: placeholder as Registry['matches.index']['types'],
+  },
+  'matches.store': {
+    methods: ["POST"],
+    pattern: '/api/v1/matches',
+    tokens: [{"old":"/api/v1/matches","type":0,"val":"api","end":""},{"old":"/api/v1/matches","type":0,"val":"v1","end":""},{"old":"/api/v1/matches","type":0,"val":"matches","end":""}],
+    types: placeholder as Registry['matches.store']['types'],
+  },
+  'scouts.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/scouts',
+    tokens: [{"old":"/api/v1/scouts","type":0,"val":"api","end":""},{"old":"/api/v1/scouts","type":0,"val":"v1","end":""},{"old":"/api/v1/scouts","type":0,"val":"scouts","end":""}],
+    types: placeholder as Registry['scouts.index']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

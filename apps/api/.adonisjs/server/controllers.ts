@@ -4,6 +4,10 @@
  */
 
 export const controllers = {
+  Clubs: () => import('#controllers/clubs_controller'),
+  Matches: () => import('#controllers/matches_controller'),
   Me: () => import('#controllers/me_controller'),
   Missions: () => import('#controllers/missions_controller'),
+  Players: () => import('#controllers/players_controller'),
+  Scouts: () => import('#controllers/scouts_controller'),
 }

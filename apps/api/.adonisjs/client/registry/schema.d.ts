@@ -79,4 +79,100 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'clubs.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/clubs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'clubs.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/clubs'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'players.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/players'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'players.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/players/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'players.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/players'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'matches.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/matches'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'matches.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/matches'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'scouts.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/scouts'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
 }
