@@ -9,6 +9,15 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      HOST: localhost
+      PORT: 3333
+      LOG_LEVEL: info
+      APP_KEY: ci_dummy_app_key_not_used_in_prod_32c
+      APP_URL: http://localhost:3333
+      SESSION_DRIVER: memory
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
