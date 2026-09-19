@@ -10,13 +10,28 @@ const dbConfig = defineConfig({
 
   connections: {
     /**
-     * PostgreSQL connection (Supabase — direct connection, not the pooler:
-     * Render runs a persistent process, so Lucid/Knex manages its own pool).
+     * PostgreSQL connection. Render's default network has no IPv6 egress,
+     * while Supabase's direct-connection host resolves IPv6-only — so
+     * production points DATABASE_URL at Supabase's Session pooler (IPv4)
+     * instead. Local dev/CI can keep using the direct connection.
      */
     pg: {
       client: "pg",
 
       connection: env.get("DATABASE_URL"),
+
+      /**
+       * Lucid/Knex manages its own pool of connections against whichever
+       * host DATABASE_URL points to. Kept small and explicit rather than
+       * left to the driver default — this is a low-traffic internal tool
+       * (a few dozen scouts/admins, not high-frequency polling), so a
+       * handful of connections comfortably covers concurrent requests
+       * without pressuring Supabase's own connection limit.
+       */
+      pool: {
+        min: 2,
+        max: 10,
+      },
 
       migrations: {
         /**

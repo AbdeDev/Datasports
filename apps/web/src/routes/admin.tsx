@@ -38,7 +38,10 @@ export const Route = createFileRoute("/admin")({
 const ALERT_STATUSES = ["a_reattribuer", "scout_indisponible"];
 
 function AdminDashboard() {
-  const { data: missions } = useQuery(missionsQueryOptions);
+  // Several admins can be looking at this screen at once — poll so one
+  // admin's reassignment/cancellation shows up for the others without
+  // requiring a manual reload.
+  const { data: missions } = useQuery({ ...missionsQueryOptions, refetchInterval: 20_000 });
   const alerts = missions?.filter((m) => ALERT_STATUSES.includes(m.status)) ?? [];
 
   return (

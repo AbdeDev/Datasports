@@ -1,3 +1,4 @@
+import db from "@adonisjs/lucid/services/db";
 import EvaluationAnswer from "#models/evaluation_answer";
 import EvaluationCriterion from "#models/evaluation_criterion";
 import EvaluationGrid from "#models/evaluation_grid";
@@ -73,54 +74,74 @@ export default class ObservationService {
       }
     }
 
-    const observation = await Observation.create({
-      missionId: mission.id,
-      playerId: data.playerId,
-      evaluationGridId: grid.id,
-      playingTimeMinutes: data.playingTimeMinutes ?? null,
-      weather: data.weather ?? null,
-      pitchCondition: data.pitchCondition ?? null,
-      currentLevel: data.currentLevel,
-      potential: data.potential,
-      strengths: data.strengths,
-      weaknesses: data.weaknesses,
-      generalComment: data.generalComment ?? null,
-      decision: data.decision,
+    const observation = await db.transaction(async (trx) => {
+      // Atomically claim the mission: if two submissions race (double-click,
+      // retry), only one can flip "acceptee" -> "terminee" — the other sees
+      // 0 affected rows and the whole transaction rolls back cleanly.
+      const claimed = await Mission.query({ client: trx })
+        .where("id", mission.id)
+        .where("status", "acceptee")
+        .returning("id")
+        .update({ status: "terminee" });
+
+      if (claimed.length === 0) {
+        throw new ObservationConflictError("Only an accepted mission can be evaluated");
+      }
+
+      const observation = await Observation.create(
+        {
+          missionId: mission.id,
+          playerId: data.playerId,
+          evaluationGridId: grid.id,
+          playingTimeMinutes: data.playingTimeMinutes ?? null,
+          weather: data.weather ?? null,
+          pitchCondition: data.pitchCondition ?? null,
+          currentLevel: data.currentLevel,
+          potential: data.potential,
+          strengths: data.strengths,
+          weaknesses: data.weaknesses,
+          generalComment: data.generalComment ?? null,
+          decision: data.decision,
+          analysisGenerated: this.generateAnalysis(data, criteriaById),
+        },
+        { client: trx },
+      );
+
+      await ObservedPosition.createMany(
+        data.observedPositions.map((position) => ({ observationId: observation.id, position })),
+        { client: trx },
+      );
+
+      await EvaluationAnswer.createMany(
+        data.answers.map((answer) => ({
+          observationId: observation.id,
+          evaluationCriterionId: answer.criterionId,
+          score: answer.score,
+          comment: answer.comment ?? null,
+        })),
+        { client: trx },
+      );
+
+      // The decision drives the player's status, historized (brief §11.3).
+      const player = await Player.query({ client: trx }).where("id", data.playerId).firstOrFail();
+      const newStatus = decisionToPlayerStatus[data.decision];
+      if (player.status !== newStatus) {
+        player.useTransaction(trx);
+        player.status = newStatus;
+        await player.save();
+        await PlayerStatusHistory.create(
+          {
+            playerId: player.id,
+            status: newStatus,
+            changedBy: scout.id,
+            note: "Suite à une observation",
+          },
+          { client: trx },
+        );
+      }
+
+      return observation;
     });
-
-    await ObservedPosition.createMany(
-      data.observedPositions.map((position) => ({ observationId: observation.id, position })),
-    );
-
-    await EvaluationAnswer.createMany(
-      data.answers.map((answer) => ({
-        observationId: observation.id,
-        evaluationCriterionId: answer.criterionId,
-        score: answer.score,
-        comment: answer.comment ?? null,
-      })),
-    );
-
-    observation.analysisGenerated = this.generateAnalysis(data, criteriaById);
-    await observation.save();
-
-    // Submitting the evaluation completes the mission (brief §10 status flow).
-    mission.status = "terminee";
-    await mission.save();
-
-    // The decision drives the player's status, historized (brief §11.3).
-    const player = await Player.findOrFail(data.playerId);
-    const newStatus = decisionToPlayerStatus[data.decision];
-    if (player.status !== newStatus) {
-      player.status = newStatus;
-      await player.save();
-      await PlayerStatusHistory.create({
-        playerId: player.id,
-        status: newStatus,
-        changedBy: scout.id,
-        note: "Suite à une observation",
-      });
-    }
 
     return Observation.query()
       .where("id", observation.id)
