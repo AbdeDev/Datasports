@@ -20,3 +20,20 @@ export const reassignMissionValidator = vine.compile(
     scoutId: vine.number(),
   }),
 );
+
+export const withdrawMissionValidator = vine.compile(
+  vine.object({
+    reason: vine.string().trim().optional(),
+  }),
+);
+
+// Unlike the brief's default (partial info allowed), the user wants every
+// field required for a spotted player: nom, prénom, poste, club.
+export const addSpottedPlayerValidator = vine.compile(
+  vine.object({
+    firstName: vine.string().trim().minLength(1),
+    lastName: vine.string().trim().minLength(1),
+    officialPosition: vine.string().trim().minLength(1),
+    clubId: vine.number(),
+  }),
+);

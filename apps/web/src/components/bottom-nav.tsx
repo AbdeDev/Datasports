@@ -1,15 +1,22 @@
+import { currentUserQueryOptions } from "@/features/auth/api";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ClipboardList, LayoutDashboard, Star, User } from "lucide-react";
+import { ClipboardList, LayoutDashboard, Shield, Star, User } from "lucide-react";
 
-const navItems = [
+const baseNavItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/missions", label: "Missions", icon: ClipboardList },
   { to: "/watchlist", label: "Watchlist", icon: Star },
   { to: "/profile", label: "Profil", icon: User },
 ] as const;
 
+const pilotageItem = { to: "/admin", label: "Pilotage", icon: Shield } as const;
+
 export function BottomNav() {
+  const { data: user } = useQuery(currentUserQueryOptions);
+  const navItems = user?.role === "admin" ? [...baseNavItems, pilotageItem] : baseNavItems;
+
   return (
     <nav
       className={cn(
@@ -17,7 +24,7 @@ export function BottomNav() {
         "pb-[env(safe-area-inset-bottom)]",
       )}
     >
-      <ul className="grid grid-cols-4">
+      <ul className={cn("grid", navItems.length === 5 ? "grid-cols-5" : "grid-cols-4")}>
         {navItems.map(({ to, label, icon: Icon }) => (
           <li key={to}>
             <Link

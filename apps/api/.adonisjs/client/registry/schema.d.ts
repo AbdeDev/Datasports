@@ -79,6 +79,30 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'missions.withdraw': {
+    methods: ["POST"]
+    pattern: '/api/v1/missions/:id/withdraw'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'missions.add_spotted_player': {
+    methods: ["POST"]
+    pattern: '/api/v1/missions/:id/targets'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'clubs.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/clubs'

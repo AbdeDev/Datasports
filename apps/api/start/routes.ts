@@ -29,6 +29,8 @@ router
         router.post("/", "#controllers/missions_controller.store");
         router.post(":id/respond", "#controllers/missions_controller.respond");
         router.post(":id/reassign", "#controllers/missions_controller.reassign");
+        router.post(":id/withdraw", "#controllers/missions_controller.withdraw");
+        router.post(":id/targets", "#controllers/missions_controller.addSpottedPlayer");
       })
       .prefix("missions");
 
