@@ -31,6 +31,30 @@ router
         router.post(":id/reassign", "#controllers/missions_controller.reassign");
       })
       .prefix("missions");
+
+    router
+      .group(() => {
+        router.get("/", "#controllers/clubs_controller.index");
+        router.post("/", "#controllers/clubs_controller.store");
+      })
+      .prefix("clubs");
+
+    router
+      .group(() => {
+        router.get("/", "#controllers/players_controller.index");
+        router.get(":id", "#controllers/players_controller.show");
+        router.post("/", "#controllers/players_controller.store");
+      })
+      .prefix("players");
+
+    router
+      .group(() => {
+        router.get("/", "#controllers/matches_controller.index");
+        router.post("/", "#controllers/matches_controller.store");
+      })
+      .prefix("matches");
+
+    router.get("scouts", "#controllers/scouts_controller.index");
   })
   .prefix("/api/v1")
   .use(middleware.auth());

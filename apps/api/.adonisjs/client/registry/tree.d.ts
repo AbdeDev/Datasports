@@ -12,4 +12,20 @@ export interface ApiDefinition {
     respond: typeof routes['missions.respond']
     reassign: typeof routes['missions.reassign']
   }
+  clubs: {
+    index: typeof routes['clubs.index']
+    store: typeof routes['clubs.store']
+  }
+  players: {
+    index: typeof routes['players.index']
+    show: typeof routes['players.show']
+    store: typeof routes['players.store']
+  }
+  matches: {
+    index: typeof routes['matches.index']
+    store: typeof routes['matches.store']
+  }
+  scouts: {
+    index: typeof routes['scouts.index']
+  }
 }
