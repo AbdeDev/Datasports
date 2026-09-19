@@ -22,9 +22,12 @@ export default await Env.create(new URL("../", import.meta.url), {
   APP_KEY: Env.schema.secret(),
   APP_URL: Env.schema.string({ format: "url", tld: false }),
 
-  // Session
-  SESSION_DRIVER: Env.schema.enum(["cookie", "memory", "database"] as const),
-
   // Database
   DATABASE_URL: Env.schema.string(),
+
+  // Auth (Supabase) — JWKS verification, no secret needed
+  SUPABASE_URL: Env.schema.string({ format: "url", tld: false }),
+
+  // CORS (comma-separated allowlist, production only)
+  CORS_ORIGIN: Env.schema.string.optional(),
 });

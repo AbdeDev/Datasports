@@ -8,7 +8,6 @@
 */
 
 import router from "@adonisjs/core/services/router";
-import { controllers } from "#generated/controllers";
 import { middleware } from "#start/kernel";
 
 router.get("/", () => {
@@ -21,21 +20,6 @@ router.get("/health", () => {
 
 router
   .group(() => {
-    router
-      .group(() => {
-        router.post("signup", [controllers.NewAccount, "store"]);
-        router.post("login", [controllers.AccessTokens, "store"]);
-      })
-      .prefix("auth")
-      .as("auth");
-
-    router
-      .group(() => {
-        router.get("profile", [controllers.Profile, "show"]);
-        router.post("logout", [controllers.AccessTokens, "destroy"]);
-      })
-      .prefix("account")
-      .as("profile")
-      .use(middleware.auth());
+    router.get("me", "#controllers/me_controller.show").use(middleware.auth());
   })
   .prefix("/api/v1");

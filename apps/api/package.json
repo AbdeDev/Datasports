@@ -50,15 +50,13 @@
     "youch": "^4.1.1"
   },
   "dependencies": {
-    "@adonisjs/auth": "^10.1.0",
     "@adonisjs/core": "^7.5.0",
     "@adonisjs/cors": "^3.0.0",
     "@adonisjs/lucid": "^22.4.2",
-    "@adonisjs/session": "^8.1.0",
-    "@adonisjs/shield": "^9.0.0",
     "@japa/api-client": "^3.2.1",
     "@tuyau/core": "^1.2.2",
     "@vinejs/vine": "^4.4.0",
+    "jose": "^5.9.6",
     "luxon": "^3.7.2",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2"
