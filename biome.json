@@ -14,7 +14,8 @@
       ".adonisjs",
       "tmp",
       ".tanstack",
-      "routeTree.gen.ts"
+      "routeTree.gen.ts",
+      "database/schema.ts"
     ]
   }
 }
