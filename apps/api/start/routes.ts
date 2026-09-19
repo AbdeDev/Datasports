@@ -32,8 +32,11 @@ router
         router.post(":id/withdraw", "#controllers/missions_controller.withdraw");
         router.post(":id/cancel", "#controllers/missions_controller.cancel");
         router.post(":id/targets", "#controllers/missions_controller.addSpottedPlayer");
+        router.post(":id/observations", "#controllers/observations_controller.store");
       })
       .prefix("missions");
+
+    router.get("evaluation-grids/active", "#controllers/evaluation_grids_controller.active");
 
     router
       .group(() => {

@@ -15,6 +15,12 @@ export interface ApiDefinition {
     cancel: typeof routes['missions.cancel']
     addSpottedPlayer: typeof routes['missions.add_spotted_player']
   }
+  observations: {
+    store: typeof routes['observations.store']
+  }
+  evaluationGrids: {
+    active: typeof routes['evaluation_grids.active']
+  }
   clubs: {
     index: typeof routes['clubs.index']
     store: typeof routes['clubs.store']

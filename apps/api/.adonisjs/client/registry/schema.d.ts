@@ -115,6 +115,30 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'observations.store': {
+    methods: ["POST"]
+    pattern: '/api/v1/missions/:id/observations'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'evaluation_grids.active': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/evaluation-grids/active'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
   'clubs.index': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/clubs'

@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as WatchlistRouteImport } from './routes/watchlist'
+import { Route as EvaluateIdRouteImport } from './routes/evaluate.$id'
 import { Route as MissionsIndexRouteImport } from './routes/missions.index'
 import { Route as MissionsIdRouteImport } from './routes/missions.$id'
 
@@ -48,6 +49,11 @@ const WatchlistRoute = WatchlistRouteImport.update({
   path: '/watchlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EvaluateIdRoute = EvaluateIdRouteImport.update({
+  id: '/evaluate/$id',
+  path: '/evaluate/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MissionsIndexRoute = MissionsIndexRouteImport.update({
   id: '/missions/',
   path: '/missions/',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
+  '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
   '/missions/': typeof MissionsIndexRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
+  '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
   '/missions': typeof MissionsIndexRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/signup': typeof SignupRoute
   '/watchlist': typeof WatchlistRoute
+  '/evaluate/$id': typeof EvaluateIdRoute
   '/missions/$id': typeof MissionsIdRoute
   '/missions/': typeof MissionsIndexRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signup'
     | '/watchlist'
+    | '/evaluate/$id'
     | '/missions/$id'
     | '/missions/'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signup'
     | '/watchlist'
+    | '/evaluate/$id'
     | '/missions/$id'
     | '/missions'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signup'
     | '/watchlist'
+    | '/evaluate/$id'
     | '/missions/$id'
     | '/missions/'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   SignupRoute: typeof SignupRoute
   WatchlistRoute: typeof WatchlistRoute
+  EvaluateIdRoute: typeof EvaluateIdRoute
   MissionsIdRoute: typeof MissionsIdRoute
   MissionsIndexRoute: typeof MissionsIndexRoute
 }
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WatchlistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/evaluate/$id': {
+      id: '/evaluate/$id'
+      path: '/evaluate/$id'
+      fullPath: '/evaluate/$id'
+      preLoaderRoute: typeof EvaluateIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/missions/': {
       id: '/missions/'
       path: '/missions'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   SignupRoute: SignupRoute,
   WatchlistRoute: WatchlistRoute,
+  EvaluateIdRoute: EvaluateIdRoute,
   MissionsIdRoute: MissionsIdRoute,
   MissionsIndexRoute: MissionsIndexRoute,
 }
