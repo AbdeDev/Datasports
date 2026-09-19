@@ -4,6 +4,9 @@ pre-commit:
       glob: "*.{js,ts,jsx,tsx,json}"
       run: bunx biome check --write {staged_files}
       stage_fixed: true
+    env-example-secrets:
+      glob: "*.env.example"
+      run: bash scripts/check-env-example.sh {staged_files}
 
 commit-msg:
   commands:
