@@ -1,3 +1,4 @@
+import { isDemo } from "@/lib/demo-mode";
 import type { QueryClient } from "@tanstack/react-query";
 import { Outlet, createRootRouteWithContext, redirect, useLocation } from "@tanstack/react-router";
 
@@ -14,6 +15,10 @@ const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password"
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: async ({ location }) => {
+    if (isDemo) {
+      if (PUBLIC_PATHS.includes(location.pathname)) throw redirect({ to: "/" });
+      return;
+    }
     if (PUBLIC_PATHS.includes(location.pathname)) {
       return;
     }
@@ -33,9 +38,17 @@ function RootComponent() {
   return (
     <>
       {showNav && <AppSidebar />}
-      <main className={showNav ? "pb-20 md:pb-0 md:pl-64" : undefined}>
+      <main className={showNav ? "min-h-svh pb-24 md:pb-0 md:pl-72" : undefined}>
+        {isDemo && (
+          <div
+            role="status"
+            className="border-b border-amber-400/30 bg-amber-400/10 px-4 py-3 text-center text-xs text-amber-200"
+          >
+            Mode démo · Données fictives · Navigation libre, enregistrement désactivé
+          </div>
+        )}
         {showNav ? (
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-7xl">
             <Outlet />
           </div>
         ) : (

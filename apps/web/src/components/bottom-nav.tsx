@@ -8,7 +8,7 @@ export function BottomNav() {
   return (
     <nav
       className={cn(
-        "fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background md:hidden",
+        "fixed inset-x-0 bottom-0 z-50 border-t border-border bg-background/95 shadow-[0_-8px_30px_rgba(0,0,0,.35)] backdrop-blur-xl md:hidden",
         "pb-[env(safe-area-inset-bottom)]",
       )}
     >
@@ -20,8 +20,8 @@ export function BottomNav() {
               <Link
                 to={to}
                 activeOptions={{ exact: to === "/" }}
-                className="flex flex-col items-center justify-center gap-1 py-3 text-muted-foreground transition-colors active:bg-muted"
-                activeProps={{ className: "text-primary" }}
+                className="relative flex min-h-16 flex-col items-center justify-center gap-1 py-2 text-muted-foreground transition-colors active:bg-muted"
+                activeProps={{ className: "text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:bg-primary" }}
               >
                 <span className="relative">
                   <Icon className="size-6" />

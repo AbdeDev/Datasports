@@ -1,3 +1,4 @@
+import { isDemo } from "@/lib/demo-mode";
 import { supabase } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
 import { type ReactNode, createContext, useContext, useEffect, useState } from "react";
@@ -14,6 +15,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (isDemo) {
+      setIsLoading(false);
+      return;
+    }
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setIsLoading(false);

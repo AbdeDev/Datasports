@@ -1,6 +1,7 @@
+import { isDemo } from "./demo-mode";
 import { supabase } from "./supabase";
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
 
 export class ApiError extends Error {
   status: number;
@@ -13,6 +14,11 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (isDemo) {
+    const { demoRequest } = await import("./demo-data");
+    return demoRequest<T>(path, init.method);
+  }
+  if (!apiUrl) throw new ApiError("Configuration manquante : VITE_API_URL.", 0);
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
 
@@ -28,12 +34,21 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!response.ok) {
     const message = await response
       .json()
-      .then((body) => (typeof body?.error === "string" ? body.error : null))
+      .then((body) => {
+        if (typeof body?.error === "string") return body.error;
+        if (Array.isArray(body?.errors))
+          return body.errors
+            .map((entry: { message?: string }) => entry.message)
+            .filter(Boolean)
+            .join(" ");
+        return typeof body?.message === "string" ? body.message : null;
+      })
       .catch(() => null);
 
     throw new ApiError(message ?? `Une erreur est survenue (${response.status})`, response.status);
   }
 
+  if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
 
