@@ -34,7 +34,13 @@ function Login() {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) {
         setIsSubmitting(false);
-        setError("Email ou mot de passe incorrect.");
+        setError(
+          signInError.code === "email_not_confirmed"
+            ? "Confirmez votre adresse email avec le lien reçu avant de vous connecter."
+            : signInError.code === "invalid_credentials"
+              ? "Email ou mot de passe incorrect. Utilisez les identifiants du compte créé sur ce projet."
+              : "Connexion refusée par Supabase. Réessayez ou utilisez « Mot de passe oublié ».",
+        );
         return;
       }
 

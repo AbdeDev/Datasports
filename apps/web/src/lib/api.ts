@@ -22,7 +22,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
 
-  const response = await fetch(`${apiUrl}${path}`, {
+  const response = await fetch(`${import.meta.env.DEV ? "" : apiUrl}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
