@@ -8,6 +8,7 @@ import {
 } from "@/features/missions/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { CalendarDays, ChevronRight } from "lucide-react";
 
 export const Route = createFileRoute("/missions/")({
@@ -18,15 +19,51 @@ export const Route = createFileRoute("/missions/")({
 function Missions() {
   const { data: missions } = useSuspenseQuery(missionsQueryOptions);
 
+  const [filter, setFilter] = useState("all");
+  const visibleMissions = missions.filter(
+    (mission) =>
+      filter === "all" ||
+      (filter === "active"
+        ? !["terminee", "annulee"].includes(mission.status)
+        : mission.status === filter),
+  );
   return (
-    <div className="p-6">
-      <h1 className="font-heading text-2xl font-bold">Missions</h1>
+    <div className="px-4 py-6 sm:px-6 lg:px-10 lg:py-9">
+      <p className="elite-kicker">Au plus près du terrain</p>
+      <h1 className="mt-3 font-heading text-4xl font-black tracking-tight uppercase">
+        Vos missions<span className="text-primary">.</span>
+      </h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        Préparez le match. Observez les détails. Faites la différence.
+      </p>
+      <div className="my-7 flex flex-wrap gap-2" aria-label="Filtrer les missions">
+        {[
+          ["all", "Toutes"],
+          ["active", "Actives"],
+          ["proposee", "À répondre"],
+          ["terminee", "Terminées"],
+        ].map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={filter === value}
+            onClick={() => setFilter(value)}
+            className={
+              filter === value
+                ? "rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+                : "rounded-full border border-border px-4 py-2 text-xs text-muted-foreground hover:text-foreground"
+            }
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
-      {missions.length === 0 ? (
-        <p className="mt-6 text-sm text-muted-foreground">Aucune mission pour l'instant.</p>
+      {visibleMissions.length === 0 ? (
+        <p className="mt-6 text-sm text-muted-foreground">Aucune mission dans cette sélection.</p>
       ) : (
-        <ul className="mt-4 space-y-3">
-          {missions.map((mission) => (
+        <ul className="mt-4 grid gap-4 xl:grid-cols-2">
+          {visibleMissions.map((mission) => (
             <li key={mission.id}>
               <MissionCard mission={mission} />
             </li>
