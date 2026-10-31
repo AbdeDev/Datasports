@@ -33,9 +33,9 @@ function RootComponent() {
   return (
     <>
       {showNav && <AppSidebar />}
-      <main className={showNav ? "pb-20 md:pb-0 md:pl-64" : undefined}>
+      <main className={showNav ? "min-h-svh pb-24 md:pb-0 md:pl-72" : undefined}>
         {showNav ? (
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-7xl">
             <Outlet />
           </div>
         ) : (
