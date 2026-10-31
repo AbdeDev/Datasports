@@ -21,7 +21,10 @@ export function BottomNav() {
                 to={to}
                 activeOptions={{ exact: to === "/" }}
                 className="relative flex min-h-16 flex-col items-center justify-center gap-1 py-2 text-muted-foreground transition-colors active:bg-muted"
-                activeProps={{ className: "text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:bg-primary" }}
+                activeProps={{
+                  className:
+                    "text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:bg-primary",
+                }}
               >
                 <span className="relative">
                   <Icon className="size-6" />

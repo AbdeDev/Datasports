@@ -8,8 +8,8 @@ import {
 } from "@/features/missions/api";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { CalendarDays, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/missions/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(missionsQueryOptions),

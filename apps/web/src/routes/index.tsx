@@ -24,7 +24,7 @@ import {
   Star,
   Target,
   TrendingUp,
-  UsersRound,
+  type UsersRound,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
