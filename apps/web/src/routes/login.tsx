@@ -30,28 +30,16 @@ function Login() {
     setError(null);
     setIsSubmitting(true);
 
-    try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-      if (signInError) {
-        setIsSubmitting(false);
-        setError(
-          signInError.code === "email_not_confirmed"
-            ? "Confirmez votre adresse email avec le lien reçu avant de vous connecter."
-            : signInError.code === "invalid_credentials"
-              ? "Email ou mot de passe incorrect. Utilisez les identifiants du compte créé sur ce projet."
-              : "Connexion refusée par Supabase. Réessayez ou utilisez « Mot de passe oublié ».",
-        );
-        return;
-      }
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
-      const user = await getCurrentUser();
-      navigate({ to: user.role === "admin" ? "/admin" : "/" });
-    } catch {
-      await supabase.auth.signOut().catch(() => undefined);
-      setError("Connexion impossible. Vérifiez votre connexion et réessayez.");
-    } finally {
+    if (signInError) {
       setIsSubmitting(false);
+      setError(signInError.message);
+      return;
     }
+
+    const user = await getCurrentUser();
+    navigate({ to: user.role === "admin" ? "/admin" : "/" });
   }
 
   return (

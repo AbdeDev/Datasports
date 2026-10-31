@@ -1,9 +1,7 @@
 {
   "name": "elite-scouting",
   "private": true,
-  "workspaces": [
-    "apps/*"
-  ],
+  "workspaces": ["apps/*"],
   "engines": {
     "bun": ">=1.1.0",
     "node": ">=26"
@@ -16,9 +14,7 @@
     "typecheck": "bun run --filter './apps/*' typecheck",
     "test": "bun run --filter './apps/*' test",
     "build": "bun run --filter './apps/*' build",
-    "prepare": "lefthook install",
-    "dev:demo": "npm --prefix apps/web run dev:demo",
-    "dev:front": "npm --prefix apps/web run dev"
+    "prepare": "lefthook install"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

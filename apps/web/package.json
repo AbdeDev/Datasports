@@ -10,8 +10,7 @@
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "dev:demo": "vite dev --mode demo --port 3000"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -44,8 +43,5 @@
     "typescript": "^6.0.2",
     "vite": "^8.0.0"
   },
-  "trustedDependencies": [
-    "esbuild",
-    "lightningcss"
-  ]
+  "trustedDependencies": ["esbuild", "lightningcss"]
 }

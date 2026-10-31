@@ -1,5 +1,4 @@
 import { MissionChart } from "@/components/mission-chart";
-import { isDemo } from "@/lib/demo-mode";
 import { RouteError, RoutePending } from "@/components/route-states";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -271,9 +270,7 @@ function Dashboard() {
             <div>
               <p className="text-xs font-semibold">Données chargées</p>
               <p className="text-[10px] text-muted-foreground">
-                {isDemo
-                  ? "Exemples fictifs, sans connexion API"
-                  : "Missions et joueurs issus de votre API"}
+                Missions et joueurs issus de votre API
               </p>
             </div>
           </div>
